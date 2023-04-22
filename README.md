@@ -11,7 +11,7 @@ Koenig, M., Hondula. K.L., Jamalinia, E., Dai, J., Asner, G.P. (2023): WaterQual
 This repository is a toolbox for bio-optical modelling and builds on the extensive work of many researchers. It has mainly been inspired by the work of Peter Gege and the Water Color Simulator (WASI) [3,4,5,6]. Please give proper attribution when using this toolbox.
 
 ### LITERATURE
-[1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
+[1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [doi.org/10.1364/OE.11.002873](doi.org/10.1364/OE.11.002873)
 
 [2] Gege (2012): Analytic model for the direct and diffuse components of downwelling spectral irradiance in water. [10.1364/AO.51.001407]
 
