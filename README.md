@@ -2,18 +2,15 @@
 
 The WaterQuality python package (v0.0.1) contains the bio-optical models of Albert & Mobley (2003) [1] and couples them to the surface reflectance model of Gege (2012) [2]. The intention of the authors was to built a modular and extendable software package that allows the combination and creation of different models to study optics of natural water bodies. It can be used for simulation and analysis of spectroscopy data through inversion of the above-mentioned models. Single parts of the models can also be run as single modules, e.g., for the analysis of spectral backscattering or absorption measurements.
 
-## INSTALLATION
-tba
-
-## PLEASE GIVE US CREDIT
+### PLEASE GIVE US CREDIT
 This python package has been created by members of the CarbonMapper Land and Ocean Program at the Center for Global Discovery and Conservation Science at Arizona State University. When using this toolbox, please use the following citation:
 
 Koenig, M., Hondula. K.L., Jamalinia, E., Dai, J., Asner, G.P. (2023): WaterQuality python package (Version x) [Software]. Available from https://github.com/CMLandOcean/WaterQuality
 
-## ACKNOWLEDGEMENTS
+### ACKNOWLEDGEMENTS
 This repository is a toolbox for bio-optical modelling and builds on the extensive work of many researchers. It has mainly been inspired by the work of Peter Gege and the Water Color Simulator (WASI) [3,4,5,6]. Please give proper attribution when using this toolbox.
 
-## LITERATURE
+### LITERATURE
 [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
 [2] Gege (2012): Analytic model for the direct and diffuse components of downwelling spectral irradiance in water. [10.1364/AO.51.001407]
 [3] Gege (2004): The water color simulator WASI: an integrating software tool for analysis and simulation of optical in situ spectra. [10.1016/j.cageo.2004.03.005]
