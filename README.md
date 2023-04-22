@@ -1,6 +1,6 @@
 # WaterQuality
 
-The WaterQuality python package (v0.0.1) contains the bio-optical models of Albert & Mobley (2003) [1] and couples them to the surface reflectance model of Gege (2012) [2]. The intention of the authors was to build a modular and extendable software package that allows the combination and creation of different models to study optics of natural water bodies. It can be used for simulation and analysis of spectroscopy data through inversion of the above-mentioned models. Single parts of the models can also be run as single modules, e.g., for the analysis of spectral backscattering or absorption measurements.
+The WaterQuality python package (v0.0.1) contains the bio-optical models of Albert & Mobley (2003) [1] and couples them to the surface reflectance model of Gege (2012) [2]. The intention of the authors was to build a modular and extendable software package that allows the combination and creation of different models to study optical properties of natural water bodies. It can be used for simulation and analysis of spectroscopy data through inversion of the above-mentioned models. Single parts of the models can also be run as single modules, e.g., for the analysis of spectral backscattering or absorption measurements.
 
 ### PLEASE GIVE US CREDIT
 This python package has been created by members of the CarbonMapper Land and Ocean Program at the Center for Global Discovery and Conservation Science at Arizona State University. When using this toolbox, please use the following citation:
