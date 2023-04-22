@@ -246,7 +246,7 @@ def a(C_0 = 0,
     :param K: constant added to the exponential function, default: 0
     :param a_NAP_spec_lambda_0: specific absorption coefficient of NAP at referece wavelength lambda_0, default: 0.041
     :param S_NAP: spectral slope of NAP absorption spectrum, default: 0.011 [1/nm]
-    :param T_W: actual water temperatre in degrees C, default: 20
+    :param T_W: actual water temperature in degrees C, default: 20
     :param T_W_0: reference temperature in degrees C, default: 20
     :param a_w_res: optional, absorption of pure water resampled to sensor's band settings. Will be computed within function if not provided.
     :param da_W_div_dT_res: optional, temperature gradient of pure water absorption resampled  to sensor's band settings. Will be computed within function if not provided.
