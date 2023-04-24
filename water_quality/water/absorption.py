@@ -242,7 +242,7 @@ def a(C_0 = 0,
     :param C_Y: CDOM absorption coefficient at lambda_0 [m-1]
     :param C_X: concentration of non-algal particles type I [mg/L], default: 0
     :param C_Mie: concentration of non-algal particles type II [mg/L], default: 0
-    :wavelengths: wavelengths to compute a for, default [nm]: np.arange(400,800)
+    :wavelengths: wavelengths to compute a for [nm], default: np.arange(400,800)
     :param S: spectral slope of CDOM absorption spectrum [m-1], default: 0.014
     :param lambda_0: wavelength used for normalization of CDOM and NAP functions [nm], default: 440
     :param K: constant added to the CDOM exponential function [m-1], default: 0
