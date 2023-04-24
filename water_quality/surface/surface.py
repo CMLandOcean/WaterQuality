@@ -134,7 +134,7 @@ def R_rs_surf(wavelengths=np.arange(400,800),
     :param g_dsa: intensity of aerosol scattering part of diffuse component of E_d in sr-1
     :param f_dd: fraction of direct downwelling irradiance, default: 1
     :param f_ds: fraction of diffuse downwelling irradiance,default: 1
-    :param rho_L: fraction of sky radiance reflected into the senspo's field of view
+    :param rho_L: fraction of sky radiance reflected into the sensor's field of view
     :param E_0_res: optional, precomputing E_0 saves a lot of time.
     :param a_oz_res: optional, precomputing a_oz saves a lot of time.
     :param a_ox_res: optional, precomputing a_ox saves a lot of time.

@@ -113,7 +113,7 @@ def b_bX(C_X: float = 0,
          b_X_norm_res = []):
     """
     Spectral backscattering coefficient of particles of type I defined by a normalized scattering coefficient with arbitrary wavelength dependency [1].
-    The default parameter setting is representative for Lake Constance [1, 3].
+    The default parameter setting is representative for Lake Constance [1, 2].
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     [2] Heege, T. (2000): Flugzeuggestützte Fernerkundung von Wasserinhaltsstoffen am Bodensee. PhD thesis. DLR-Forschungsbericht 2000-40, 134 p.

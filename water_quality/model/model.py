@@ -51,7 +51,8 @@ def r_rs_dp(u,
     """
     Subsurface radiance reflectance of optically deep water after Albert & Mobley (2003) [1].
     
-    [1] 
+    [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
+
     
     :param u: ratio of backscattering coefficient to the sum of absorption and backscattering coefficients
     :param theta_sun: sun zenith angle in air in units of radians, is converted to in water using Snell's law
@@ -124,7 +125,8 @@ def r_rs_sh(C_0 = 0,
     """
     Subsurface radiance reflectance of optically shallow water after Albert & Mobley (2003) [1].
     
-    [1]
+    [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
+
     
     """
     # Backscattering and absorption coefficients of the water body depending on the concentration of optically active water constituents
