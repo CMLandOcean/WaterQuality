@@ -129,9 +129,9 @@ def R_rs_surf(wavelengths=np.arange(400,800),
     :param WV: precipitable water [cm], default: 2.5
     :param alpha: Angstroem exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
     :param beta: turbidity coefficient as a measure of concentration (typically ranges from 0.16 to 0.50 [1]), default: 0.2606
-    :param g_dd: intensity of direct component of E_d in sr-1
-    :param g_dsr: intensity of Rayleigh scattering part of diffuse component of E_d [sr-1]
-    :param g_dsa: intensity of aerosol scattering part of diffuse component of E_d [sr-1]
+    :param g_dd: intensity of direct component of E_d [sr-1], default: 0.02
+    :param g_dsr: intensity of Rayleigh scattering part of diffuse component of E_d [sr-1], default: 1/np.pi()
+    :param g_dsa: intensity of aerosol scattering part of diffuse component of E_d [sr-1], default: 1/np.pi()
     :param f_dd: fraction of direct downwelling irradiance, default: 1
     :param f_ds: fraction of diffuse downwelling irradiance,default: 1
     :param rho_L: fraction of sky radiance reflected into the sensor's field of view
