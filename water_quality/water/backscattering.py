@@ -90,9 +90,9 @@ def b_bphy(C_phy: float = 0,
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
-    :param C_phy: phytoplankton concentration in ug/L, default: 0
-    :param wavelengths: wavelengths to compute b_bphy for in nm, default: np.arange(400,800)
-    :param b_bphy_spec:  specific backscattering coefficient at 550 nm in m2/mg, default: 0.0010
+    :param C_phy: phytoplankton concentration [ug L-1], default: 0
+    :param wavelengths: wavelengths to compute b_bphy for [nm], default: np.arange(400,800)
+    :param b_bphy_spec:  specific backscattering coefficient at 550 nm in [m2 mg-1], default: 0.0010
     :param b_phy_norm_res: optional, preresampling b_phy_norm before inversion saves a lot of time.
     :return:
     """       
@@ -118,9 +118,9 @@ def b_bX(C_X: float = 0,
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     [2] Heege, T. (2000): Flugzeuggestützte Fernerkundung von Wasserinhaltsstoffen am Bodensee. PhD thesis. DLR-Forschungsbericht 2000-40, 134 p.
     
-    :param C_X: concentration of non-algal particles type I in mg/L, default: 0
-    :param wavelengths: wavelengths to compute b_bX for in nm, default: np.arange(400,800)
-    :param b_bX_spec: specific backscattering coefficient of non-algal particles type I, default: 0.0086 [2]
+    :param C_X: concentration of non-algal particles type I [mg L-1], default: 0
+    :param wavelengths: wavelengths to compute b_bX for [nm], default: np.arange(400,800)
+    :param b_bX_spec: specific backscattering coefficient of non-algal particles type I [m2 g-1], default: 0.0086 [2]
     :param b_bX_norm_factor: normalized scattering coefficient with arbitrary wavelength dependency, default: 1
     :param b_X_norm_res: optional, precomputing b_bX_norm before inversion saves a lot of time.
     :return: spectral backscattering coefficient of particles of type I
@@ -148,10 +148,10 @@ def b_bMie(C_Mie: float = 0,
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     [2] Heege, T. (2000): Flugzeuggestützte Fernerkundung von Wasserinhaltsstoffen am Bodensee. PhD thesis. DLR-Forschungsbericht 2000-40, 134 p.
     
-    :param C_Mie: concentration of non-algal particles type II in mg/L, default: 0
-    :param wavelengths: wavelengths to compute b_bMie for in nm, default: np.arange(400,800)
-    :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II in m2/g, default: 0.0042
-    :param lambda_S: reference wavelength, default: 500 nm
+    :param C_Mie: concentration of non-algal particles type II [mg L-1], default: 0
+    :param wavelengths: wavelengths to compute b_bMie for [nm], default: np.arange(400,800)
+    :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II [m2 g-1], default: 0.0042
+    :param lambda_S: reference wavelength [nm], default: 500 nm
     :param n: Angström exponent, default: 0
     :param b_bMie_norm_res: optional, if n and lambda_S are not fit params, the last part of the equation can be precomputed to save time.
     :return: spectral backscattering coefficient of particles of type II
@@ -180,13 +180,13 @@ def b_bNAP(C_X: float = 0,
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     [2] Heege, T. (2000): Flugzeuggestützte Fernerkundung von Wasserinhaltsstoffen am Bodensee. PhD thesis. DLR-Forschungsbericht 2000-40, 134 p.
     
-    :param C_X: concentration of non-algal particles type I in mg/L, default: 0
-    :param C_Mie: concentration of non-algal particles type II in mg/L, default: 0
-    :param wavelengths: wavelengths to compute b_bNAP for in nm, default: np.arange(400,800)
-    :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II in m2/g, default: 0.0042
-    :param lambda_S: reference wavelength, default: 500 nm
-    :param n: Angström exponent, default: 0
-    :param b_bX_spec: specific backscattering coefficient of non-algal particles type I, default: 0.0086 [2]
+    :param C_X: concentration of non-algal particles type I [mg L-1], default: 0
+    :param C_Mie: concentration of non-algal particles type II [mg L-1], default: 0
+    :param wavelengths: wavelengths to compute b_bNAP for [nm], default: np.arange(400,800)
+    :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II [m2 g-1] , default: 0.0042
+    :param lambda_S: reference wavelength for scattering particles type II [nm], default: 500 nm
+    :param n: Angström exponent of particle type II scattering, default: -1
+    :param b_bX_spec: specific backscattering coefficient of non-algal particles type I [m2 g-1], default: 0.0086 [2]
     :param b_bX_norm_factor: normalized scattering coefficient with arbitrary wavelength dependency, default: 1
     :param b_X_norm_res: optional, precomputing b_bX_norm before inversion saves a lot of time.
     :param b_Mie_norm_res: optional, if n and lambda_S are not fit params, the last part of the equation can be precomputed to save time.
@@ -220,17 +220,17 @@ def b_b(C_X: float = 0,
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     [2] Heege, T. (2000): Flugzeuggestützte Fernerkundung von Wasserinhaltsstoffen am Bodensee. PhD thesis. DLR-Forschungsbericht 2000-40, 134 p.
     
-    :param C_X: concentration of non-algal particles type I in mg/L, default: 0
-    :param C_Mie: concentration of non-algal particles type II in mg/L, default: 0
-    :param C_phy: phytoplankton concentration in ug/L, default: 0
-    :param wavelengths: wavelengths to compute b_bNAP for in nm, default: np.arange(400,800)
+    :param C_X: concentration of non-algal particles type I [mg L-1], default: 0
+    :param C_Mie: concentration of non-algal particles type II [mg L-1], default: 0
+    :param C_phy: phytoplankton concentration [ug L-1], default: 0
+    :param wavelengths: wavelengths to compute b_b for [nm], default: np.arange(400,800)
     :param fresh: boolean to decide if to compute b_bw for fresh or oceanic water, default: True
-    :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II in m2/g, default: 0.0042
-    :param lambda_S: reference wavelength, default: 500 nm
-    :param n: Angström exponent, default: 0
-    :param b_bX_spec: specific backscattering coefficient of non-algal particles type I, default: 0.0086 [2]
+    :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II [m2 g-1] , default: 0.0042
+    :param lambda_S: reference wavelength for scattering particles type II [nm], default: 500 nm
+    :param n: Angström exponent of particle type II scattering, default: -1
+    :param b_bX_spec: specific backscattering coefficient of non-algal particles type I [m2 g-1], default: 0.0086 [2]
     :param b_bX_norm_factor: normalized scattering coefficient with arbitrary wavelength dependency, default: 1
-    :param b_bphy_spec: specific backscattering coefficient at 550 nm in m2/mg, default: 0.0010
+    :param b_bphy_spec:  specific backscattering coefficient at 550 nm in [m2 mg-1], default: 0.0010
     :param b_bw_res: optional, precomputing b_bw b_bw saves a lot of time during inversion.
     :param b_phy_norm_res: optional, preresampling b_phy_norm saves a lot of time during inversion.
     :param b_X_norm_res: optional, precomputing b_bX_norm before inversion saves a lot of time.
