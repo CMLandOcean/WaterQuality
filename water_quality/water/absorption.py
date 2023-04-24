@@ -144,7 +144,8 @@ def a_Y(C_Y = 0,
     :param K: Constant added to the exponential function [m-1], default: 0 
               "What this constant represents is not clear. In some cases it is supposed to account for scattering by the dissolved component, 
               however there is no reason to believe such scattering would be spectrally ﬂat (see Bricaud et al. 1981 for an in-depth discussion)" [1].
-              "K is a constant addressing background noise and potential instrument bias" [2]         
+              "K is a constant addressing background noise and potential instrument bias" [2]     
+    :param a_Y_N_res: optional, precomputing a_Y_norm before inversion saves a lot of time.   
     :return: spectral absorption coefficient of CDOM or yellow substances
     """
     if len(a_Y_N_res)==0:
@@ -152,7 +153,6 @@ def a_Y(C_Y = 0,
     else:
         a_Y_N = a_Y_N_res
     
-    #a_Y_norm = np.exp(-S * (wavelengths - lambda_0))
     a_Y = C_Y * a_Y_N + K
     
     return a_Y
