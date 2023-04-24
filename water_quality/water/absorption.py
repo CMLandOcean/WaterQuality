@@ -133,16 +133,18 @@ def a_Y(C_Y = 0,
         a_Y_N_res=[]):
     """
     Exponential approximation of spectral absorption of CDOM or yellow substances.
+
+    [1] Mobley (2022): The Oceanic Optics Book [doi.org/10.25607/OBP-1710]
+    [2] Grunert et al. (2018): Characterizing CDOM Spectral Variability Across Diverse Regions and Spectral Ranges [doi.org/10.1002/2017GB005756]).
    
     :param C_Y: CDOM absorption coefficient at lambda_0 [1/m]
     :wavelengths: wavelengths to compute a_Y for, default: np.arange(400,800)
     :param S: spectral slope of CDOM absorption spectrum, default: 0.014 [1/nm]
     :param lambda_0: wavelength used for normalization in nm, default: 440 nm
-    :param K: Constant added to the exponential function. "What this constant represents is not clear. In some cases it is supposed to account 
-              for scattering by the dissolved component, however there is no reason to believe such scattering would be spectrally ﬂat (see Bricaud et al. 1981
-              for an in-depth discussion)" (Mobley [OceanOpticsBook], 2022).
-              "K is a constant addressing background noise and potential instrument bias (1/m)" (Grunert et al. 2018 [doi.org/10.1002/2017GB005756]).
-              , default: 0
+    :param K: Constant added to the exponential function, default: 0 
+              "What this constant represents is not clear. In some cases it is supposed to account for scattering by the dissolved component, 
+              however there is no reason to believe such scattering would be spectrally ﬂat (see Bricaud et al. 1981 for an in-depth discussion)" [1].
+              "K is a constant addressing background noise and potential instrument bias (1/m)" [2]         
     :return: spectral absorption coefficient of CDOM or yellow substances
     """
     if len(a_Y_N_res)==0:
