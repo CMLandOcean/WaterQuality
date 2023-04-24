@@ -141,10 +141,10 @@ def a_Y(C_Y = 0,
     :wavelengths: wavelengths to compute a_Y for, default: np.arange(400,800)
     :param S: spectral slope of CDOM absorption spectrum, default: 0.014 [1/nm]
     :param lambda_0: wavelength used for normalization in nm, default: 440 nm
-    :param K: Constant added to the exponential function, default: 0 
+    :param K: Constant added to the exponential function [m-1], default: 0 
               "What this constant represents is not clear. In some cases it is supposed to account for scattering by the dissolved component, 
               however there is no reason to believe such scattering would be spectrally ﬂat (see Bricaud et al. 1981 for an in-depth discussion)" [1].
-              "K is a constant addressing background noise and potential instrument bias (1/m)" [2]         
+              "K is a constant addressing background noise and potential instrument bias" [2]         
     :return: spectral absorption coefficient of CDOM or yellow substances
     """
     if len(a_Y_N_res)==0:
