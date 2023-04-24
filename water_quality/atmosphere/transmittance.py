@@ -43,7 +43,7 @@ from . import absorption
 from .. helper import resampling
 
 
-def M(theta_sun=30, a=0.50572, b=6.07995, c=1.6364):
+def M(theta_sun=np.radians(30), a=0.50572, b=6.07995, c=1.6364):
     """
     Atmospheric path length [1].
     
@@ -54,7 +54,7 @@ def M(theta_sun=30, a=0.50572, b=6.07995, c=1.6364):
     [2] Gregg and Carder (1990): A simple spectral solar irradiance model for cloudless maritime atmospheres.
     [3] Kasten and Young (1989): Revised optical air mass tables and approximation formula.
     
-    :param theta_sun: sun zenith angle [radians]
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param a: numerical value from [2], default: 0.50572
     :param b: numerical value from [2], default: 6.07995°
     :param c: numerical value from [2], default: 1.6364
@@ -64,13 +64,13 @@ def M(theta_sun=30, a=0.50572, b=6.07995, c=1.6364):
     return M
     
     
-def M_cor(theta_sun=30, P=1013.25):
+def M_cor(theta_sun=np.radians(30), P=1013.25):
     """
     Atmospheric path length corrected for nonstandard atmospheric pressure [1].
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param P: atmospheric pressure [mbar], default: 1013.25
     :return: atmospheric path length corrected for nonstandard atmospheric pressure
     """
@@ -78,13 +78,13 @@ def M_cor(theta_sun=30, P=1013.25):
     return M_cor
     
     
-def M_oz(theta_sun=30):
+def M_oz(theta_sun=np.radians(30)):
     """
     Atmospheric path length for ozone [1].
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :return: atmospheric path length for ozone
     """
     M_oz = 1.0035 / (math.cos(theta_sun)**2 + 0.007)**0.5
@@ -142,13 +142,13 @@ def omega_a(AM=5, RH=80):
     return omega_a
     
     
-def F_a(theta_sun=30, alpha=1.317):
+def F_a(theta_sun=np.radians(30), alpha=1.317):
     """
     Aerosol forward scattering probability [1]
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param alpha: Angstroem exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
     :return: aerosol forward scattering probability
     """
@@ -161,14 +161,14 @@ def F_a(theta_sun=30, alpha=1.317):
     return F_a
 
 
-def T_r(wavelengths=np.arange(400,800), theta_sun=30, P=1013.25):
+def T_r(wavelengths=np.arange(400,800), theta_sun=np.radians(30), P=1013.25):
     """
     Rayleigh scattering [1]
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param wavelengths: wavelengths to compute T_r for, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param P: atmospheric pressure [mbar], default: 1013.25
     :return: rayleigh scattering
     """
@@ -176,14 +176,14 @@ def T_r(wavelengths=np.arange(400,800), theta_sun=30, P=1013.25):
     return T_r
     
     
-def T_aa(wavelengths=np.arange(400,800), theta_sun=30, AM=5, RH=80):
+def T_aa(wavelengths=np.arange(400,800), theta_sun=np.radians(30), AM=5, RH=80):
     """
     Aerosol absorption [1]
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param wavelengths: wavelengths to compute T_aa for, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param AM: air mass type [1: open ocean aerosols .. 10: continental aerosols], default: 5
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
     :return: aerosol absorption
@@ -192,14 +192,14 @@ def T_aa(wavelengths=np.arange(400,800), theta_sun=30, AM=5, RH=80):
     return T_aa
     
     
-def T_as(wavelengths=np.arange(400,800), theta_sun=30, AM=5, RH=80, lambda_a=550, alpha=1.317, beta=0.2606):
+def T_as(wavelengths=np.arange(400,800), theta_sun=np.radians(30), AM=5, RH=80, lambda_a=550, alpha=1.317, beta=0.2606):
     """
     Aerosol scattering [1]
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param wavelengths: wavelengths to compute T_aa for, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param AM: air mass type [1: open ocean aerosols .. 10: continental aerosols], default: 5
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
     :param lambda_a: reference wavelength, default: 550
@@ -211,14 +211,14 @@ def T_as(wavelengths=np.arange(400,800), theta_sun=30, AM=5, RH=80, lambda_a=550
     return T_as
     
     
-def T_oz(wavelengths=np.arange(400,800), theta_sun=30, H_oz=0.381, a_oz_res=[]):
+def T_oz(wavelengths=np.arange(400,800), theta_sun=np.radians(30), H_oz=0.381, a_oz_res=[]):
     """
     Ozone absorption [1]
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param wavelengths: wavelengths to compute T_aa for, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param H_oz: ozone scale height [cm], default: 0.381
     :param a_oz_res: optional, precomputing a_oz saves a lot of time.
     """
@@ -233,7 +233,7 @@ def T_ox(wavelengths=np.arange(400,800), theta_sun=np.radians(30), P=1013.25, a_
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param wavelengths: wavelengths to compute T_aa for, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param P: atmospheric pressure [mbar], default: 1013.25
     :param a_ox_res: optional, precomputing a_ox saves a lot of time.
     """
@@ -241,14 +241,14 @@ def T_ox(wavelengths=np.arange(400,800), theta_sun=np.radians(30), P=1013.25, a_
     return T_ox
     
     
-def T_wv(wavelengths=np.arange(400,800), theta_sun=30, WV=2.5, a_wv_res=[]):
+def T_wv(wavelengths=np.arange(400,800), theta_sun=np.radians(30), WV=2.5, a_wv_res=[]):
     """
     Water vapor absorption [1]
     
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param wavelengths: wavelengths to compute T_aa for, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param WV: precipitable water [cm], default: 2.5
     :param a_ox_res: optional, precomputing a_ox saves a lot of time.
     """
