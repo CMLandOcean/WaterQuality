@@ -118,7 +118,7 @@ def a_Y_norm(wavelengths = np.arange(400,800),
     Exponential approximation of normalized spectral absorption of CDOM.
     
     :wavelengths: wavelengths to compute a_Y for, default: np.arange(400,800)
-    :param S: spectral slope, default: 0.014 [1/nm]
+    :param S: spectral slope of CDOM absorption spectrum, default: 0.014 [1/nm]
     :param lambda_0: wavelength used for normalization in nm, default: 440 nm
     :return: normalized spectral absorption of CDOM
     """
@@ -136,7 +136,7 @@ def a_Y(C_Y = 0,
    
     :param C_Y: CDOM absorption coefficient at lambda_0 [1/m]
     :wavelengths: wavelengths to compute a_Y for, default: np.arange(400,800)
-    :param S: spectral slope, default: 0.014 [1/nm]
+    :param S: spectral slope of CDOM absorption spectrum, default: 0.014 [1/nm]
     :param lambda_0: wavelength used for normalization in nm, default: 440 nm
     :param K: Constant added to the exponential function. "What this constant represents is not clear. In some cases it is supposed to account 
               for scattering by the dissolved component, however there is no reason to believe such scattering would be spectrally ﬂat (see Bricaud et al. 1981
@@ -241,9 +241,9 @@ def a(C_0 = 0,
     :param C_X: concentration of non-algal particles type I in mg/L, default: 0
     :param C_Mie: concentration of non-algal particles type II in mg/L, default: 0
     :wavelengths: wavelengths to compute a for, default: np.arange(400,800)
-    :param S: spectral slope, default: 0.014 [1/nm]
-    :param lambda_0: wavelength used for normalization in nm, default: 440 nm
-    :param K: constant added to the exponential function, default: 0
+    :param S: spectral slope of CDOM absorption spectrum, default: 0.014 [1/nm]
+    :param lambda_0: wavelength used for normalization of CDOM and NAP functions in nm, default: 440 nm
+    :param K: constant added to the CDOM exponential function, default: 0
     :param a_NAP_spec_lambda_0: specific absorption coefficient of NAP at referece wavelength lambda_0, default: 0.041
     :param S_NAP: spectral slope of NAP absorption spectrum, default: 0.011 [1/nm]
     :param T_W: actual water temperature in degrees C, default: 20
