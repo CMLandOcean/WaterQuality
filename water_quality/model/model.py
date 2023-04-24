@@ -53,13 +53,12 @@ def r_rs_dp(u,
     
     [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
 
-    
     :param u: ratio of backscattering coefficient to the sum of absorption and backscattering coefficients
-    :param theta_sun: sun zenith angle in air in units of radians, is converted to in water using Snell's law
-    :param theta_view: viewing angle in air in units of radians, is converted to in water using Snell's law
+    :param theta_sun: sun zenith angle in air [radians], is converted to in water using Snell's law
+    :param theta_view: viewing angle in air in units [radians], is converted to in water using Snell's law
     :param n1: refrective index of origin medium, default: 1 for air
     :param n2: refrective index of destination medium, default: 1.33 for water
-    :return: radiance reflectance of deep water just below the water surface in units of sr-1.
+    :return: subsurface radiance reflectance of deep water [sr-1]
     """    
     f_rs = 0.0512 * (1 + 4.6659 * u - 7.8387 * u**2 + 5.4571 * u**3) * (1 + 0.1098/np.cos(air_water.snell(theta_sun, n1, n2))) * (1 + 0.4021/np.cos(air_water.snell(theta_view, n1, n2)))
     r_rs_dp = f_rs * u
@@ -109,7 +108,7 @@ def r_rs_sh(C_0 = 0,
             fresh: bool = False,
             T_W=20,
             T_W_0=20,
-            zB = 1,
+            zB = 2,
             wavelengths: np.array = np.arange(400,800),
             a_i_spec_res=[],
             a_w_res=[],
@@ -126,8 +125,62 @@ def r_rs_sh(C_0 = 0,
     Subsurface radiance reflectance of optically shallow water after Albert & Mobley (2003) [1].
     
     [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
-
+    [2] Heege, T. (2000): Flugzeuggestützte Fernerkundung von Wasserinhaltsstoffen am Bodensee. PhD thesis. DLR-Forschungsbericht 2000-40, 134 p.
+    [3] Albert, A., & Mobley, C. (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters [doi.org/10.1364/OE.11.002873]
     
+    :param C_0: concentration of phytoplankton type 0 [ug L-1], default: 0
+    :param C_1: concentration of phytoplankton type 1 [ug L-1], default: 0
+    :param C_2: concentration of phytoplankton type 2 [ug L-1], default: 0
+    :param C_3: concentration of phytoplankton type 3 [ug L-1], default: 0
+    :param C_4: concentration of phytoplankton type 4 [ug L-1], default: 0
+    :param C_5: concentration of phytoplankton type 5 [ug L-1], default: 0
+    :param C_Y: CDOM absorption coefficient at lambda_0 [m-1], default: 0
+    :param C_X: concentration of non-algal particles type I [mg L-1], default: 0
+    :param C_Mie: concentration of non-algal particles type II [mg L-1], default: 0
+    :param f_0: fractional cover of bottom type 0, default: 0
+    :param f_1: fractional cover of bottom type 1, default: 0
+    :param f_2: fractional cover of bottom type 2, default: 0
+    :param f_3: fractional cover of bottom type 3, default: 0
+    :param f_4: fractional cover of bottom type 4, default: 0
+    :param f_5: fractional cover of bottom type 5, default: 0
+    :param B_0: proportion of radiation reflected towards the sensor from bottom type 0, default: 1/np.pi
+    :param B_1: proportion of radiation reflected towards the sensor from bottom type 1, default: 1/np.pi
+    :param B_2: proportion of radiation reflected towards the sensor from bottom type 2, default: 1/np.pi
+    :param B_3: proportion of radiation reflected towards the sensor from bottom type 3, default: 1/np.pi
+    :param B_4: proportion of radiation reflected towards the sensor from bottom type 4, default: 1/np.pi
+    :param B_5: proportion of radiation reflected towards the sensor from bottom type 5, default: 1/np.pi
+    :param b_bphy_spec:  specific backscattering coefficient at 550 nm in [m2 mg-1], default: 0.0010
+    :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II [m2 g-1] , default: 0.0042
+    :param b_bX_spec: specific backscattering coefficient of non-algal particles type I [m2 g-1], default: 0.0086 [2]
+    :param b_bX_norm_factor: normalized scattering coefficient with arbitrary wavelength dependency, default: 1
+    :param a_NAP_spec_lambda_0: specific absorption coefficient of NAP at referece wavelength lambda_0 [m2 g-1], default: 0.041
+    :param S: spectral slope of CDOM absorption spectrum [m-1], default: 0.014
+    :param K: constant added to the CDOM exponential function [m-1], default: 0
+    :param S_NAP: spectral slope of NAP absorption spectrum, default [m-1]: 0.011
+    :param n: Angström exponent of particle type II scattering, default: -1
+    :param lambda_0: wavelength used for normalization [nm], default: 440 nm
+    :param lambda_S: reference wavelength [nm], default: 500 nm
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
+    :param theta_view: viewing angle [radians], default: np.radians(0) (nadir) 
+    :param n1: Refrective index of origin medium, default: 1 for air
+    :param n2: Refrective index of destination medium, default: 1.33 for water
+    :param kappa_0: coefficient depending on scattering phase function, default: 1.0546 [3]
+    :param fresh: boolean to decide if to compute b_bw for fresh or oceanic water, default: True
+    :param T_W: actual water temperature [degrees C], default: 20
+    :param T_W_0: reference temperature [degrees C], default: 20
+    :param zB: water depth [m], default: 2
+    :wavelengths: wavelengths to compute r_rs_sh for [nm], default: np.arange(400,800) 
+    :param a_i_spec_res: optional, specific absorption coefficients of phytoplankton types resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_w_res: optional, absorption of pure water resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_Y_N_res: optional, normalized absorption coefficients of CDOM resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_NAP_N_res: optional, normalized absorption coefficients of NAP resampled to sensor's band settings. Will be computed within function if not provided.
+    :param b_phy_norm_res: optional, preresampling b_phy_norm saves a lot of time during inversion. Will be computed within function if not provided.
+    :param b_bw_res: optional, precomputing b_bw b_bw saves a lot of time during inversion. Will be computed within function if not provided.
+    :param b_X_norm_res: optional, precomputing b_bX_norm before inversion saves a lot of time. Will be computed within function if not provided.
+    :param b_Mie_norm_res: optional, if n and lambda_S are not fit params, the last part of the equation can be precomputed to save time. Will be computed within function if not provided.
+    :param R_i_b_res: optional, preresampling R_i_b before inversion saves a lot of time. Will be computed within function if not provided.
+    :param da_W_div_dT_res: optional, temperature gradient of pure water absorption resampled  to sensor's band settings. Will be computed within function if not provided.
+    :return: subsurface radiance reflectance of shallow water [sr-1]
     """
     # Backscattering and absorption coefficients of the water body depending on the concentration of optically active water constituents
     bs = backscattering.b_b(C_X=C_X,
@@ -217,10 +270,29 @@ def func2opt(params,
     """
     Error function around model to be minimized by changing fit parameters.
     
-    :param params:
-    :param R_rs:
-    :param wavelengths:
-    :return:
+    :param params: lmfit Parameters object containing all Parameter objects that are required to specify the model
+    :param R_rs: Remote sensing reflectance spectrum [sr-1]
+    :param wavelengths: wavelengths of R_rs bands [nm]
+    :param weights: spectral weighing coefficients
+    :param a_i_spec_res: optional, specific absorption coefficients of phytoplankton types resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_w_res: optional, absorption of pure water resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_Y_N_res: optional, normalized absorption coefficients of CDOM resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_NAP_N_res: optional, normalized absorption coefficients of NAP resampled to sensor's band settings. Will be computed within function if not provided.
+    :param b_phy_norm_res: optional, preresampling b_phy_norm saves a lot of time during inversion. Will be computed within function if not provided.
+    :param b_bw_res: optional, precomputing b_bw b_bw saves a lot of time during inversion. Will be computed within function if not provided.
+    :param b_X_norm_res: optional, precomputing b_bX_norm before inversion saves a lot of time. Will be computed within function if not provided.
+    :param b_Mie_norm_res: optional, if n and lambda_S are not fit params, the last part of the equation can be precomputed to save time. Will be computed within function if not provided.
+    :param R_i_b_res: optional, preresampling R_i_b before inversion saves a lot of time. Will be computed within function if not provided.
+    :param da_W_div_dT_res: optional, temperature gradient of pure water absorption resampled  to sensor's band settings. Will be computed within function if not provided.
+    :param E_0_res: optional, precomputing E_0 saves a lot of time. Will be computed within function if not provided.
+    :param a_oz_res: optional, precomputing a_oz saves a lot of time. Will be computed within function if not provided.
+    :param a_ox_res: optional, precomputing a_ox saves a lot of time. Will be computed within function if not provided.
+    :param a_wv_res: optional, precomputing a_wv saves a lot of time. Will be computed within function if not provided.
+    :param E_dd_res: optional, preresampling E_dd before inversion saves a lot of time. Will be computed within function if not provided.
+    :param E_dsa_res: optional, preresampling E_dsa before inversion saves a lot of time. Will be computed within function if not provided.
+    :param E_dsr_res: optional, preresampling E_dsr before inversion saves a lot of time. Will be computed within function if not provided.
+    :param E_d_res: optional, preresampling E_d before inversion saves a lot of time. Will be computed within function if not provided.
+    :return: weighted difference between measured and simulated R_rs
     """
     
     if len(weights)==0:
@@ -401,12 +473,31 @@ def invert(params,
     """
     Function to inversely fit a modeled spectrum to a measurement spectrum.
     
-    :param params:
-    :param r_rs:
-    :param wavelengths:
-    :param method:
-    :param max_nfev:
-    :return:
+    :param params: lmfit Parameters object containing all Parameter objects that are required to specify the model
+    :param R_rs: Remote sensing reflectance spectrum [sr-1]
+    :param wavelengths: wavelengths of R_rs bands [nm]
+    :param weights: spectral weighing coefficients
+    :param a_i_spec_res: optional, specific absorption coefficients of phytoplankton types resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_w_res: optional, absorption of pure water resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_Y_N_res: optional, normalized absorption coefficients of CDOM resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_NAP_N_res: optional, normalized absorption coefficients of NAP resampled to sensor's band settings. Will be computed within function if not provided.
+    :param b_phy_norm_res: optional, preresampling b_phy_norm saves a lot of time during inversion. Will be computed within function if not provided.
+    :param b_bw_res: optional, precomputing b_bw b_bw saves a lot of time during inversion. Will be computed within function if not provided.
+    :param b_X_norm_res: optional, precomputing b_bX_norm before inversion saves a lot of time. Will be computed within function if not provided.
+    :param b_Mie_norm_res: optional, if n and lambda_S are not fit params, the last part of the equation can be precomputed to save time. Will be computed within function if not provided.
+    :param R_i_b_res: optional, preresampling R_i_b before inversion saves a lot of time. Will be computed within function if not provided.
+    :param da_W_div_dT_res: optional, temperature gradient of pure water absorption resampled  to sensor's band settings. Will be computed within function if not provided.
+    :param E_0_res: optional, precomputing E_0 saves a lot of time. Will be computed within function if not provided.
+    :param a_oz_res: optional, precomputing a_oz saves a lot of time. Will be computed within function if not provided.
+    :param a_ox_res: optional, precomputing a_ox saves a lot of time. Will be computed within function if not provided.
+    :param a_wv_res: optional, precomputing a_wv saves a lot of time. Will be computed within function if not provided.
+    :param E_dd_res: optional, preresampling E_dd before inversion saves a lot of time. Will be computed within function if not provided.
+    :param E_dsa_res: optional, preresampling E_dsa before inversion saves a lot of time. Will be computed within function if not provided.
+    :param E_dsr_res: optional, preresampling E_dsr before inversion saves a lot of time. Will be computed within function if not provided.
+    :param E_d_res: optional, preresampling E_d before inversion saves a lot of time. Will be computed within function if not provided.
+    :param method: name of the fitting method to use by lmfit, default: 'least-squares'
+    :param max_nfev: maximum number of function evaluations, default: 400
+    :return: object containing the optimized parameters and several goodness-of-fit statistics.
     """    
     
     if params['fit_surface']==True:
@@ -437,6 +528,21 @@ def invert(params,
                        max_nfev=max_nfev) 
                        
     elif params['fit_surface']==False:
+
+        params.add('P', vary=False) 
+        params.add('AM', vary=False) 
+        params.add('RH', vary=False) 
+        params.add('H_oz', vary=False)
+        params.add('WV', vary=False) 
+        params.add('alpha', vary=False) 
+        params.add('beta', vary=False) 
+        params.add('g_dd', vary=False) 
+        params.add('g_dsr', vary=False) 
+        params.add('g_dsa', vary=False) 
+        params.add('f_dd', vary=False) 
+        params.add('f_ds', vary=False) 
+        params.add('rho_L', vary=False) 
+
         res = minimize(func2opt, 
                        params, 
                        args=(R_rs, 
@@ -479,11 +585,29 @@ def forward(params,
             E_dsr_res=[],
             E_d_res=[]):
     """
-    Forward simulation of a shallow water spectrum based on the provided parameterization.
+    Forward simulation of a shallow water remote sensing reflectance spectrum based on the provided parameterization.
     
-    :param params:
-    :param wavelengths: np.array of wavelengths 
-    :return: R_rs
+    :param params: lmfit Parameters object containing all Parameter objects that are required to specify the model
+    :param wavelengths: wavelengths of R_rs bands [nm]
+    :param a_i_spec_res: optional, specific absorption coefficients of phytoplankton types resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_w_res: optional, absorption of pure water resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_Y_N_res: optional, normalized absorption coefficients of CDOM resampled to sensor's band settings. Will be computed within function if not provided.
+    :param a_NAP_N_res: optional, normalized absorption coefficients of NAP resampled to sensor's band settings. Will be computed within function if not provided.
+    :param b_phy_norm_res: optional, preresampling b_phy_norm saves a lot of time. Will be computed within function if not provided.
+    :param b_bw_res: optional, precomputing b_bw b_bw saves a lot of time . Will be computed within function if not provided.
+    :param b_X_norm_res: optional, precomputing b_bX_norm saves a lot of time. Will be computed within function if not provided.
+    :param b_Mie_norm_res: optional, if n and lambda_S are not fit params, the last part of the equation can be precomputed to save time. Will be computed within function if not provided.
+    :param R_i_b_res: optional, preresampling R_i_b saves a lot of time. Will be computed within function if not provided.
+    :param da_W_div_dT_res: optional, preresampling da_W_div_dT saves a lot of time. Will be computed within function if not provided.
+    :param E_0_res: optional, preresampling E_0 saves a lot of time. Will be computed within function if not provided.
+    :param a_oz_res: optional, preresampling a_oz saves a lot of time. Will be computed within function if not provided.
+    :param a_ox_res: optional, preresampling a_ox saves a lot of time. Will be computed within function if not provided.
+    :param a_wv_res: optional, preresampling a_wv saves a lot of time. Will be computed within function if not provided.
+    :param E_dd_res: optional, precomputing E_dd saves a lot of time. Will be computed within function if not provided.
+    :param E_dsa_res: optional, precomputing E_dsa saves a lot of time. Will be computed within function if not provided.
+    :param E_dsr_res: optional, precomputing E_dsr saves a lot of time. Will be computed within function if not provided.
+    :param E_d_res: optional, precomputing E_d saves a lot of time. Will be computed within function if not provided.
+    :return: R_rs: simulated remote sensing reflectance spectrum [sr-1]
     """
     
     if params['fit_surface']==True:
