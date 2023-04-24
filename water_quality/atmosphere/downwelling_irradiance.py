@@ -60,7 +60,7 @@ def E_dd(wavelengths=np.arange(400,800),
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param wavelengths: wavelengths to compute tau_a fpr, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param P: atmospheric pressure [mbar], default: 1013.25
     :param AM: air mass type [1: open ocean aerosols .. 10: continental aerosols], default: 5
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
@@ -106,7 +106,7 @@ def E_dsr(wavelengths=np.arange(400,800),
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param wavelengths: wavelengths to compute tau_a fpr, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param P: atmospheric pressure [mbar], default: 1013.25
     :param AM: air mass type [1: open ocean aerosols .. 10: continental aerosols], default: 5
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
@@ -151,7 +151,7 @@ def E_dsa(wavelengths=np.arange(400,800),
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param wavelengths: wavelengths to compute tau_a fpr, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param P: atmospheric pressure [mbar], default: 1013.25
     :param AM: air mass type [1: open ocean aerosols .. 10: continental aerosols], default: 5
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
@@ -209,7 +209,7 @@ def E_d(wavelengths=np.arange(400,800),
      [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
      
     :param wavelengths: wavelengths to compute tau_a fpr, default: np.arange(400,800)
-    :param theta_sun: sun zenith angle [radians], default: 30
+    :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param P: atmospheric pressure [mbar], default: 1013.25
     :param AM: air mass type [1: open ocean aerosols .. 10: continental aerosols], default: 5
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
