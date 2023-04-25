@@ -243,11 +243,11 @@ def a(C_0 = 0,
     :param C_X: concentration of non-algal particles type I [mg/L], default: 0
     :param C_Mie: concentration of non-algal particles type II [mg/L], default: 0
     :wavelengths: wavelengths to compute a for [nm], default: np.arange(400,800)
-    :param S: spectral slope of CDOM absorption spectrum [m-1], default: 0.014
+    :param S: spectral slope of CDOM absorption spectrum [nm-1], default: 0.014
     :param lambda_0: wavelength used for normalization of CDOM and NAP functions [nm], default: 440
     :param K: constant added to the CDOM exponential function [m-1], default: 0
     :param a_NAP_spec_lambda_0: specific absorption coefficient of NAP at referece wavelength lambda_0 [m2 g-1], default: 0.041
-    :param S_NAP: spectral slope of NAP absorption spectrum, default [m-1]: 0.011
+    :param S_NAP: spectral slope of NAP absorption spectrum, default [nm-1]: 0.011
     :param T_W: actual water temperature [degrees C], default: 20
     :param T_W_0: reference temperature [degrees C], default: 20
     :param a_w_res: optional, absorption of pure water resampled to sensor's band settings. Will be computed within function if not provided.
