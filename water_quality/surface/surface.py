@@ -72,12 +72,12 @@ def L_surf(wavelengths=np.arange(400,800),
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
     :param H_oz: ozone scale height [cm], default: 0.381
     :param WV: precipitable water [cm], default: 2.5
-    :param alpha: Angstroem exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
+    :param alpha: Angstroem exponent of aerosol scattering determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
     :param beta: turbidity coefficient as a measure of concentration (typically ranges from 0.16 to 0.50 [1]), default: 0.2606
     :param g_dd: intensity of direct component of E_d [sr-1]
     :param g_dsr: intensity of Rayleigh scattering part of diffuse component of E_d [sr-1]
     :param g_dsa: intensity of aerosol scattering part of diffuse component of E_d [sr-1]
-    :param rho_L: fraction of sky radiance reflected into the senspo's field of view, default: 0.02
+    :param rho_L: reflection factor of downwelling irradiance, default: 0.02
     :param E_0_res: optional, precomputing E_0 saves a lot of time.
     :param a_oz_res: optional, precomputing a_oz saves a lot of time.
     :param a_ox_res: optional, precomputing a_ox saves a lot of time.
@@ -133,8 +133,8 @@ def R_rs_surf(wavelengths=np.arange(400,800),
     :param g_dsr: intensity of Rayleigh scattering part of diffuse component of E_d [sr-1], default: 1/np.pi()
     :param g_dsa: intensity of aerosol scattering part of diffuse component of E_d [sr-1], default: 1/np.pi()
     :param f_dd: fraction of direct downwelling irradiance, default: 1
-    :param f_ds: fraction of diffuse downwelling irradiance,default: 1
-    :param rho_L: fraction of sky radiance reflected into the sensor's field of view
+    :param f_ds: fraction of diffuse downwelling irradiance, default: 1
+    :param rho_L: reflection factor of downwelling irradiance, default: 0.02
     :param E_0_res: optional, precomputing E_0 saves a lot of time.
     :param a_oz_res: optional, precomputing a_oz saves a lot of time.
     :param a_ox_res: optional, precomputing a_ox saves a lot of time.
