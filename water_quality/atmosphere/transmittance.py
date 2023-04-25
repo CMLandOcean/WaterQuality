@@ -60,7 +60,7 @@ def M(theta_sun=np.radians(30), a=0.50572, b=6.07995, c=1.6364):
     :param c: numerical value from [2], default: 1.6364
     :return: atmospheric path length
     """
-    M = 1 / (np.cos(theta_sun) + a*(90+b-theta_sun)**(-c))
+    M = 1 / (np.cos(theta_sun) + a*(90 + b - np.degrees(theta_sun))**(-c))
     return M
     
     
@@ -74,7 +74,7 @@ def M_cor(theta_sun=np.radians(30), P=1013.25):
     :param P: atmospheric pressure [mbar], default: 1013.25
     :return: atmospheric path length corrected for nonstandard atmospheric pressure
     """
-    M_cor = M(theta_sun=theta_sun) * P / (1013.25)
+    M_cor = M(theta_sun=theta_sun) * P / 1013.25
     return M_cor
     
     
@@ -138,7 +138,7 @@ def omega_a(AM=5, RH=80):
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
     :return: aerosol single scattering albedo
     """
-    omega_a = (-0.0032 * AM + 0.972) * np.exp(3.06*10**(-4) * RH)
+    omega_a = (-0.0032 * AM + 0.972) * np.exp(3.06 * 10**(-4) * RH)
     return omega_a
     
     
