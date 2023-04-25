@@ -152,9 +152,9 @@ def r_rs_sh(C_0 = 0,
     :param b_bX_spec: specific backscattering coefficient of non-algal particles type I [m2 g-1], default: 0.0086 [2]
     :param b_bX_norm_factor: normalized scattering coefficient with arbitrary wavelength dependency, default: 1
     :param a_NAP_spec_lambda_0: specific absorption coefficient of NAP at referece wavelength lambda_0 [m2 g-1], default: 0.041
-    :param S: spectral slope of CDOM absorption spectrum [m-1], default: 0.014
+    :param S: spectral slope of CDOM absorption spectrum [nm-1], default: 0.014
     :param K: constant added to the CDOM exponential function [m-1], default: 0
-    :param S_NAP: spectral slope of NAP absorption spectrum, default [m-1]: 0.011
+    :param S_NAP: spectral slope of NAP absorption spectrum, default [nm-1]: 0.011
     :param n: Angström exponent of particle type II scattering, default: -1
     :param lambda_0: wavelength used for normalization [nm], default: 440 nm
     :param lambda_S: reference wavelength [nm], default: 500 nm
