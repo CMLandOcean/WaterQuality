@@ -92,7 +92,7 @@ def b_bphy(C_phy: float = 0,
     
     :param C_phy: phytoplankton concentration [ug L-1], default: 0
     :param wavelengths: wavelengths to compute b_bphy for [nm], default: np.arange(400,800)
-    :param b_bphy_spec:  specific backscattering coefficient at 550 nm in [m2 mg-1], default: 0.0010
+    :param b_bphy_spec:  specific backscattering coefficient of phytoplankton at 550 nm in [m2 mg-1], default: 0.0010
     :param b_phy_norm_res: optional, preresampling b_phy_norm before inversion saves a lot of time.
     :return:
     """       
