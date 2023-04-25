@@ -147,7 +147,7 @@ def r_rs_sh(C_0 = 0,
     :param B_3: proportion of radiation reflected towards the sensor from bottom type 3, default: 1/np.pi
     :param B_4: proportion of radiation reflected towards the sensor from bottom type 4, default: 1/np.pi
     :param B_5: proportion of radiation reflected towards the sensor from bottom type 5, default: 1/np.pi
-    :param b_bphy_spec:  specific backscattering coefficient at 550 nm in [m2 mg-1], default: 0.0010
+    :param b_bphy_spec:  specific backscattering coefficient of phytoplankton at 550 nm in [m2 mg-1], default: 0.0010
     :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II [m2 g-1] , default: 0.0042
     :param b_bX_spec: specific backscattering coefficient of non-algal particles type I [m2 g-1], default: 0.0086 [2]
     :param b_bX_norm_factor: normalized scattering coefficient with arbitrary wavelength dependency, default: 1
@@ -156,16 +156,16 @@ def r_rs_sh(C_0 = 0,
     :param K: constant added to the CDOM exponential function [m-1], default: 0
     :param S_NAP: spectral slope of NAP absorption spectrum, default [nm-1]: 0.011
     :param n: Angström exponent of particle type II scattering, default: -1
-    :param lambda_0: wavelength used for normalization [nm], default: 440 nm
-    :param lambda_S: reference wavelength [nm], default: 500 nm
+    :param lambda_0: reference wavelength for CDOM and NAP absorption [nm], default: 440 nm
+    :param lambda_S: reference wavelength for scatteromg of particles type II [nm] , default: 500 nm
     :param theta_sun: sun zenith angle [radians], default: np.radians(30)
     :param theta_view: viewing angle [radians], default: np.radians(0) (nadir) 
-    :param n1: Refrective index of origin medium, default: 1 for air
-    :param n2: Refrective index of destination medium, default: 1.33 for water
+    :param n1: refractive index of origin medium, default: 1 for air
+    :param n2: refractive index of destination medium, default: 1.33 for water
     :param kappa_0: coefficient depending on scattering phase function, default: 1.0546 [3]
     :param fresh: boolean to decide if to compute b_bw for fresh or oceanic water, default: True
     :param T_W: actual water temperature [degrees C], default: 20
-    :param T_W_0: reference temperature [degrees C], default: 20
+    :param T_W_0: reference temperature of pure water absorption [degrees C], default: 20
     :param zB: water depth [m], default: 2
     :wavelengths: wavelengths to compute r_rs_sh for [nm], default: np.arange(400,800) 
     :param a_i_spec_res: optional, specific absorption coefficients of phytoplankton types resampled to sensor's band settings. Will be computed within function if not provided.
@@ -212,8 +212,8 @@ def r_rs_sh(C_0 = 0,
                       a_NAP_spec_lambda_0=a_NAP_spec_lambda_0,
                       S_NAP=S_NAP,
                       lambda_0=lambda_0,
-                      T_W=20,
-                      T_W_0=20,
+                      T_W=T_W,
+                      T_W_0=T_W_0,
                       a_i_spec_res = a_i_spec_res,
                       a_w_res = a_w_res,
                       a_Y_N_res = a_Y_N_res,
