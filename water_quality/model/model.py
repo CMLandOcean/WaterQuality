@@ -54,8 +54,8 @@ def r_rs_dp(u,
     [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
 
     :param u: ratio of backscattering coefficient to the sum of absorption and backscattering coefficients
-    :param theta_sun: sun zenith angle in air [radians], is converted to in water using Snell's law
-    :param theta_view: viewing angle in air in units [radians], is converted to in water using Snell's law
+    :param theta_sun: sun zenith angle in air [radians], is converted to in water using Snell's law, default: np.radians(30)
+    :param theta_view: viewing angle in air in units [radians], is converted to in water using Snell's law, np.radians(0)
     :param n1: refrective index of origin medium, default: 1 for air
     :param n2: refrective index of destination medium, default: 1.33 for water
     :return: subsurface radiance reflectance of deep water [sr-1]
