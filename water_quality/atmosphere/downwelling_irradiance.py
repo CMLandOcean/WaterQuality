@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #  Copyright 2023 
 #  Center for Global Discovery and Conservation Science, Arizona State University
 #
@@ -16,7 +16,7 @@
 #
 #
 # Translated to Python by:
-#  Marcel Koenig, mkoenig3 AT asu.edu 
+#  Marcel König, mkoenig3 AT asu.edu 
 #
 # WaterQuality
 #  Code is provided to Planet, PBC as part of the CarbonMapper Land and Ocean Program.
@@ -26,7 +26,7 @@
 #
 #  Please give proper attribution when using this code for publication:
 #
-#  Koenig, M., Hondula. K.L., Jamalinia, E., Dai, J., Asner, G.P. (2023): WaterQuality python package (Version x) [Software]. Available from https://github.com/CMLandOcean/WaterQuality
+#  König, M., Hondula. K.L., Jamalinia, E., Dai, J., Asner, G.P. (2023): WaterQuality python package (Version x) [Software]. Available from https://github.com/CMLandOcean/WaterQuality
 #
 # [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
 # [2] Gege (2012): Analytic model for the direct and diffuse components of downwelling spectral irradiance in water. [10.1364/AO.51.001407]
@@ -66,7 +66,7 @@ def E_dd(wavelengths=np.arange(400,800),
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
     :param H_oz: ozone scale height [cm], default: 0.381
     :param WV: precipitable water [cm], default: 2.5
-    :param alpha: Angstroem exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
+    :param alpha: Angström exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
     :param beta: turbidity coefficient as a measure of concentration (typically ranges from 0.16 to 0.50 [1]), default: 0.2606
     :param E_0_res: optional, precomputing E_0 saves a lot of time.
     :param a_oz_res: optional, precomputing a_oz saves a lot of time.

@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 #  Copyright 2023 
 #  Center for Global Discovery and Conservation Science, Arizona State University
 #
@@ -16,7 +16,7 @@
 #
 #
 # Translated to Python by:
-#  Marcel Koenig, mkoenig3 AT asu.edu 
+#  Marcel König, mkoenig3 AT asu.edu 
 #
 # WaterQuality
 #  Code is provided to Planet, PBC as part of the CarbonMapper Land and Ocean Program.
@@ -26,7 +26,7 @@
 #
 #  Please give proper attribution when using this code for publication:
 #
-#  Koenig, M., Hondula. K.L., Jamalinia, E., Dai, J., Asner, G.P. (2023): WaterQuality python package (Version x) [Software]. Available from https://github.com/CMLandOcean/WaterQuality
+#  König, M., Hondula. K.L., Jamalinia, E., Dai, J., Asner, G.P. (2023): WaterQuality python package (Version x) [Software]. Available from https://github.com/CMLandOcean/WaterQuality
 #
 # [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
 # [2] Gege (2012): Analytic model for the direct and diffuse components of downwelling spectral irradiance in water. [10.1364/AO.51.001407]
@@ -114,7 +114,7 @@ def tau_a(wavelengths=np.arange(400,800), lambda_a=550, alpha=1.317, beta=0.2606
     
     :param wavelengths: wavelengths to compute tau_a for, default: np.arange(400,800)
     :param lambda_a: reference wavelength, default: 550
-    :param alpha: Angstroem exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
+    :param alpha: Angström exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
     :param beta: turbidity coefficient as a measure of concentration (typically ranges from 0.16 to 0.50 [1]), default: 0.2606
     :param V: horizontal visibility [km] (typically ranges from 8 to 24), default: None
     :param H_a: aerosol scale height [km] (typically 1), default: None
@@ -149,7 +149,7 @@ def F_a(theta_sun=np.radians(30), alpha=1.317):
     [1] Gege, P. (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
     
     :param theta_sun: sun zenith angle [radians], default: np.radians(30)
-    :param alpha: Angstroem exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
+    :param alpha: Angström exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
     :return: aerosol forward scattering probability
     """
     B3 = np.log(1 - (-0.1417 * alpha + 0.82))
@@ -203,7 +203,7 @@ def T_as(wavelengths=np.arange(400,800), theta_sun=np.radians(30), AM=5, RH=80, 
     :param AM: air mass type [1: open ocean aerosols .. 10: continental aerosols], default: 5
     :param RH: relative humidity [%] (typical values range from 46 to 91 %), default: 80
     :param lambda_a: reference wavelength, default: 550
-    :param alpha: Angstroem exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
+    :param alpha: Angström exponent determining wavelength dependency (typically ranges from 0.2 to 2 [1]), default: 1.317
     :param beta: turbidity coefficient as a measure of concentration (typically ranges from 0.16 to 0.50 [1]), default: 0.2606
     :return: aerosol absorption
     """
