@@ -41,20 +41,22 @@ import pandas as pd
 from .. helper import resampling
 
 
-def morel(wavelengths: np.array, fresh: bool = True, lambda_0: int = 500):
+def morel(wavelengths: np.array = np.arange(400,800), 
+          fresh: bool = True, 
+          lambda_1 = 500):
     """
     Spectral backscattering coefficient of pure water according to Morel (1974) [1].
     
     [1] Morel, A. (1974): Optical properties of pure water and pure Sea water.
     
-    :param wavelengths: wavelengths to compute backscattering coefficient for
+    :param wavelengths: wavelengths to compute backscattering coefficient of pure water for, default: np.arange(400,800)
     :param fresh: boolean to decide if backscattering coefficient is to be computed for fresh (True, default) or oceanic water (False) with a salinity of 35-38 per mille. Values are only valid of lambda_0==500 nm.
-    :param lambda_0: reference wavelength (500 nm per default).
+    :param lambda_1: reference wavelength for backscattering of pure water [nm], default: 500
     :return: spectral backscattering coefficient of pure water
     """
     b1 = 0.00111 if fresh==True else 0.00144
         
-    b_bw = b1 * (wavelengths / lambda_0)**-4.32
+    b_bw = b1 * (wavelengths / lambda_1)**-4.32
     
     return b_bw
 
@@ -139,7 +141,7 @@ def b_bMie(C_Mie: float = 0,
            wavelengths: np.array = np.arange(400,800),
            b_bMie_spec: float = 0.0042,
            lambda_S: float = 500, 
-           n: float = 0,
+           n: float = -1,
            b_Mie_norm_res=[]):
     """
     Spectral backscattering coefficient of particles of type II "defined by the normalized scattering coefficient (wavelengths/lambda_S)**n, 
@@ -152,7 +154,7 @@ def b_bMie(C_Mie: float = 0,
     :param wavelengths: wavelengths to compute b_bMie for [nm], default: np.arange(400,800)
     :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II [m2 g-1], default: 0.0042
     :param lambda_S: reference wavelength [nm], default: 500 nm
-    :param n: Angström exponent, default: 0
+    :param n: Angström exponent of particle type II backscattering, default: -1
     :param b_bMie_norm_res: optional, if n and lambda_S are not fit params, the last part of the equation can be precomputed to save time.
     :return: spectral backscattering coefficient of particles of type II
     """
@@ -169,7 +171,7 @@ def b_bNAP(C_X: float = 0,
            wavelengths: np.array = np.arange(400,800),
            b_bMie_spec: float = 0.0042,
            lambda_S: float = 500, 
-           n: float = 0,
+           n: float = -1,
            b_bX_spec: float = 0.0086,
            b_bX_norm_factor: float = 1,
            b_X_norm_res: np.array = [],
@@ -185,7 +187,7 @@ def b_bNAP(C_X: float = 0,
     :param wavelengths: wavelengths to compute b_bNAP for [nm], default: np.arange(400,800)
     :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II [m2 g-1] , default: 0.0042
     :param lambda_S: reference wavelength for scattering particles type II [nm], default: 500 nm
-    :param n: Angström exponent of particle type II scattering, default: -1
+    :param n: Angström exponent of particle type II backscattering, default: -1
     :param b_bX_spec: specific backscattering coefficient of non-algal particles type I [m2 g-1], default: 0.0086 [2]
     :param b_bX_norm_factor: normalized scattering coefficient with arbitrary wavelength dependency, default: 1
     :param b_X_norm_res: optional, precomputing b_bX_norm before inversion saves a lot of time.
@@ -227,7 +229,7 @@ def b_b(C_X: float = 0,
     :param fresh: boolean to decide if to compute b_bw for fresh or oceanic water, default: True
     :param b_bMie_spec: specific backscattering coefficient of non-algal particles type II [m2 g-1] , default: 0.0042
     :param lambda_S: reference wavelength for scattering particles type II [nm], default: 500 nm
-    :param n: Angström exponent of particle type II scattering, default: -1
+    :param n: Angström exponent of particle type II backscattering, default: -1
     :param b_bX_spec: specific backscattering coefficient of non-algal particles type I [m2 g-1], default: 0.0086 [2]
     :param b_bX_norm_factor: normalized scattering coefficient with arbitrary wavelength dependency, default: 1
     :param b_bphy_spec:  specific backscattering coefficient at 550 nm in [m2 mg-1], default: 0.0010
