@@ -50,7 +50,7 @@ data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'data')
 
 def resample_a_w(wavelengths = np.arange(400,800)):
     """
-    Absorption coefficient of pure water (1/m) at a reference temperature of 20 degC 
+    Absorption coefficient of pure water [m-1] at a reference temperature of 20 degC 
     as a compilation from different sources as distributed with the Water Color Simulator 6 (WASI6) [1]
 
     [1] Gege (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
@@ -68,7 +68,7 @@ def resample_a_w(wavelengths = np.arange(400,800)):
 
 def resample_da_W_div_dT(wavelengths = np.arange(400,800)):
     """
-    Temperature gradient of pure water absorption (m-1  degC-1)
+    Temperature gradient of pure water absorption [m-1  degC-1]
     after Roettgers et al. (2013) [1] as distributed with the Water Color Simulator 6 (WASI6) [2]
 
     [1] Roettgers et al. (2013): Pure water spectral absorption, scattering, and real part of refractive index model.
@@ -90,7 +90,7 @@ def resample_da_W_div_dT(wavelengths = np.arange(400,800)):
 
 def resample_a_i_spec(wavelengths = np.arange(400,800)):
     """
-    Specific absorption coefficients (m2 mg-1) of six phytoplankton types compiled from multiple sources
+    Specific absorption coefficients [m2 mg-1] of six phytoplankton types compiled from multiple sources
     as distributed with the Water Color Simulator 6 (WASI6) [1] 
 
     1. phytoplankton
@@ -117,7 +117,7 @@ def resample_a_i_spec(wavelengths = np.arange(400,800)):
 def resample_b_bw(wavelengths = np.arange(400,800), 
                   fresh=True):
     """
-    Spectral backscattering coefficient of water (m-1) at selected wavelengths according to Morel (1974) [1].
+    Spectral backscattering coefficient of water [m-1] at selected wavelengths according to Morel (1974) [1].
 
     [1] Morel (1974): Optical properties of pure water and pure Sea water.
 
@@ -178,7 +178,7 @@ def resample_R_i_b(wavelengths=np.arange(400,800)):
 
 def resample_a_oz(wavelengths = np.arange(400,800)):
     """
-    Absorption of ozone (1/cm) as distributed with the Water Color Simulator 6 (WASI6) [1]
+    Absorption of ozone [cm-1] as distributed with the Water Color Simulator 6 (WASI6) [1]
     calculated using the radiative transfer model MODTRAN-3 (Gege 2012) [2]
 
     [1] Gege (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
@@ -198,7 +198,7 @@ def resample_a_oz(wavelengths = np.arange(400,800)):
 
 def resample_a_wv(wavelengths = np.arange(400,800)):
     """
-    Absorption of water vapour (1/cm) as distributed with the Water Color Simulator 6 (WASI6) [1]
+    Absorption of water vapour [cm-1] as distributed with the Water Color Simulator 6 (WASI6) [1]
     calculated using the radiative transfer model MODTRAN-3 (Gege 2012) [2]
 
     [1] Gege (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
@@ -218,7 +218,7 @@ def resample_a_wv(wavelengths = np.arange(400,800)):
     
 def resample_a_ox(wavelengths = np.arange(400,800)):
     """
-    Absorption of oxygen (1/cm) as distributed with the Water Color Simulator 6 (WASI6) [1]
+    Absorption of oxygen [cm-1] as distributed with the Water Color Simulator 6 (WASI6) [1]
     calculated using the radiative transfer model MODTRAN-3 (Gege 2012) [2]
 
     [1] Gege (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
@@ -238,7 +238,7 @@ def resample_a_ox(wavelengths = np.arange(400,800)):
     
 def resample_E_0(wavelengths = np.arange(400,800)):
     """
-    Extraterrestrial solar irradiance (mW m-2 nm-1) as distributed with the Water Color Simulator 6 (WASI6) [1]
+    Extraterrestrial solar irradiance [mW m-2 nm-1] as distributed with the Water Color Simulator 6 (WASI6) [1]
 
     [1] Gege (2021): The Water Colour Simulator WASI. User manual for WASI version 6.
 
