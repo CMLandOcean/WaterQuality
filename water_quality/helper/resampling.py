@@ -44,7 +44,9 @@ from .. water import backscattering
 
 
 # get the absolute path of the current file
-data_dir = os.path.join(os.path.dirname(__file__), "..", "..", "data")
+data_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), '..\data')
+# construct the relative path to the data folder
+# data_dir = os.path.join(current_dir, '..\data')
 
 ### Water
 
