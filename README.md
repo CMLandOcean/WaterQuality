@@ -5,7 +5,7 @@ The WaterQuality python package (v0.0.1) is an open-source framework for forward
 ### PLEASE GIVE US CREDIT
 This python package has been created by members of the CarbonMapper Land and Ocean Program at the Center for Global Discovery and Conservation Science at Arizona State University. When using this framework, please use the following citation:
 
-> _König, M., Hondula. K.L., Jamalinia, E., Dai, J., Asner, G.P. (2023): WaterQuality python package (Version x) [Software]. Available from https://github.com/CMLandOcean/WaterQuality_
+> _König, M., Hondula. K.L., Jamalinia, E., Dai, J., Vaughn, N.R., Asner, G.P. (2023): WaterQuality python package (Version x) [Software]. Available from https://github.com/CMLandOcean/WaterQuality_
 
 ### ACKNOWLEDGEMENTS
 This repository is a framework for bio-optical modelling and builds on the extensive work of many researchers. It has mainly been inspired by the work of Peter Gege and the Water Color Simulator (WASI)[^3][^4][^5][^6]. Please give proper attribution when using this toolbox.

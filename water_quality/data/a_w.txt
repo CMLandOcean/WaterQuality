@@ -9,7 +9,7 @@ from the Water Color Simulator 6 (WASI6) [1]
 304-386 nm:    Lu (2006)	
 387.5-710 nm:  Pope & Fry (1997)	
 712.3-1838 nm: Kou et al. (1993)	
-1844-4000 nm:  Roettgers et al. (2012)	
+1844-4000 nm:  Roettgers et al. (2013)	
 The gaps have been interpolated using an Akima fit [1]. 
 	
 wavelength_nm	a	
