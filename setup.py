@@ -17,7 +17,7 @@ setup(
     package_data={
         'water_quality': ['data/*.txt']
     },
-    license='Apache-2.0',
+    license='Creative Commons Attribution-NonCommercial-ShareAlike 4.0',
     install_requires=[
         'numpy >= 1.21.5',
         'scipy >= 1.7.3',
@@ -27,7 +27,6 @@ setup(
     ],
     classifiers=[
         'Programming Language :: Python :: 3',
-        'License :: OSI Approved :: Apache Software License',
         'Operating System :: OS Independent'
     ],
 )
