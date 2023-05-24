@@ -3,11 +3,11 @@
 #  Center for Global Discovery and Conservation Science, Arizona State University
 #
 #  Licensed under the:
-#  Creative Commons Attribution-ShareAlike 4.0 International (the "License");
+#  CarbonMapper Modified CC Attribution-ShareAlike 4.0 Int. (the "License");
 #  you may not use this file except in compliance with the License.
 #  You may obtain a copy of the License at
 #
-#      https://creativecommons.org/licenses/by-sa/4.0/
+#      https://github.com/CMLandOcean/WaterQuality/blob/main/LICENSE.md
 #
 #  Unless required by applicable law or agreed to in writing, software
 #  distributed under the License is distributed on an "AS IS" BASIS,
