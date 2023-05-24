@@ -24,7 +24,7 @@ h. **Licensed Rights** means the rights granted to You subject to the terms and 
 i. **Licensor** means the individual(s) or entity(ies) granting rights under this Public License.
 
 
-j. **Project Page** means the publicly accessible GitHub file repository located at https://github.com/CMLandOcean[^1].
+j. **Project Page** means the publicly accessible GitHub file repository located at https://github.com/CMLandOcean. [^1]
 
 k. **Share** means to provide material to the public by any means or process that requires permission under the Licensed Rights, such as reproduction, public display, public performance, distribution, dissemination, communication, or importation, and to make material available to the public including in ways that members of the public may access the material from a place and at a time individually chosen by them.
 
