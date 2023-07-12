@@ -59,7 +59,121 @@ def K_d(a,
     :param n2: refractive index of destination medium, default: 1.33 for water
     :param kappa_0: coefficient depending on scattering phase function, default: 1.0546 [2]
     :return: diffuse attenuation for downwelling irradiance
+
+    # Math: K_d(\lambda) = K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'}
     """   
     K_d = kappa_0 * ((a + b_b) / np.cos(air_water.snell(theta_sun, n1=1, n2=1.33)))
     
     return K_d
+
+def dK_d_div_dC_i(
+        da_div_dC_i,
+        b_b, 
+        theta_sun = np.radians(30),
+        n1=1,
+        n2=1.33,
+        kappa_0 = 1.0546):
+    """
+    # Math: \frac{\partial}{\partial C_i}K_d(\lambda) = \frac{\partial}{\partial C_i} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial C_i}a
+    """
+    dK_d_div_dC_i = kappa_0 / np.cos(air_water.snell(theta_sun, n1=1, n2=1.33)) * da_div_dC_i
+
+    return dK_d_div_dC_i
+
+def dK_d_div_dC_Y(
+        da_div_dC_Y,
+        b_b, 
+        theta_sun = np.radians(30),
+        n1=1,
+        n2=1.33,
+        kappa_0 = 1.0546):
+    """
+    # Math: \frac{\partial}{\partial C_Y}K_d(\lambda) = \frac{\partial}{\partial C_Y} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial C_Y}a
+    """
+    dK_d_div_dC_Y = kappa_0 / np.cos(air_water.snell(theta_sun, n1=1, n2=1.33)) * da_div_dC_Y
+
+    return dK_d_div_dC_Y
+
+def dK_d_div_dS(
+        da_div_dS,
+        b_b, 
+        theta_sun = np.radians(30),
+        n1=1,
+        n2=1.33,
+        kappa_0 = 1.0546):
+    """
+    # Math: \frac{\partial}{\partial S}K_d(\lambda) = \frac{\partial}{\partial S} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial S}a
+    """
+    dK_d_div_dS = kappa_0 / np.cos(air_water.snell(theta_sun, n1=1, n2=1.33)) * da_div_dS
+
+    return dK_d_div_dS
+
+def dK_d_div_dS_NAP(
+        da_div_dS_NAP,
+        b_b, 
+        theta_sun = np.radians(30),
+        n1=1,
+        n2=1.33,
+        kappa_0 = 1.0546):
+    """
+    # Math: \frac{\partial}{\partial S_{NAP}}K_d(\lambda) = \frac{\partial}{\partial S_{NAP}} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial S_{NAP}}a
+    """
+    dK_d_div_dS_NAP = kappa_0 / np.cos(air_water.snell(theta_sun, n1=1, n2=1.33)) * da_div_dS_NAP
+
+    return dK_d_div_dS_NAP
+
+def dK_d_div_dC_X(
+        da_div_dC_X,
+        db_b_div_dC_X, 
+        theta_sun = np.radians(30),
+        n1=1,
+        n2=1.33,
+        kappa_0 = 1.0546):
+    """
+    # Math: \frac{\partial}{\partial C_X}K_d(\lambda) = \frac{\partial}{\partial C_X} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} (\frac{\partial}{\partial C_X}a + \frac{\partial}{\partial C_X}b_b)
+    """
+    dK_d_div_dC_X = (kappa_0 / np.cos(air_water.snell(theta_sun, n1=1, n2=1.33))) * (da_div_dC_X + db_b_div_dC_X)
+
+    return dK_d_div_dC_X
+
+def dK_d_div_dC_Mie(
+        da_div_dC_Mie,
+        db_b_div_dC_Mie, 
+        theta_sun = np.radians(30),
+        n1=1,
+        n2=1.33,
+        kappa_0 = 1.0546):
+    """
+    # Math: \frac{\partial}{\partial C_{Mie}}K_d(\lambda) = \frac{\partial}{\partial C_{Mie}} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} (\frac{\partial}{\partial C_{Mie}}a + \frac{\partial}{\partial C_{Mie}}b_b)
+    """
+    dK_d_div_dC_Mie = (kappa_0 / np.cos(air_water.snell(theta_sun, n1=1, n2=1.33))) * (da_div_dC_Mie + db_b_div_dC_Mie)
+
+    return dK_d_div_dC_Mie
+
+def dK_d_div_dn(
+        a,
+        db_b_div_dn, 
+        theta_sun = np.radians(30),
+        n1=1,
+        n2=1.33,
+        kappa_0 = 1.0546):
+    """
+    # Math: \frac{\partial}{\partial n}K_d(\lambda) = \frac{\partial}{\partial n} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial n}b_b
+    """
+    dK_d_div_dn = kappa_0 / np.cos(air_water.snell(theta_sun, n1=1, n2=1.33)) * db_b_div_dn
+
+    return dK_d_div_dn
+
+def dK_d_div_C_phy(
+        a,
+        db_b_div_C_phy, 
+        theta_sun = np.radians(30),
+        n1=1,
+        n2=1.33,
+        kappa_0 = 1.0546):
+    """
+    # Math: \frac{\partial}{\partial C_{phy}}K_d(\lambda) = \frac{\partial}{\partial C_{phy}} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial C_{phy}}b_b
+    """
+    dK_d_div_dC_phy = kappa_0 / np.cos(air_water.snell(theta_sun, n1=1, n2=1.33)) * db_b_div_C_phy
+
+    return dK_d_div_dC_phy
