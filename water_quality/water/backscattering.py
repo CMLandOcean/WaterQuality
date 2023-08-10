@@ -110,8 +110,7 @@ def b_bphy(C_phy: float = 0,
     
     return b_bphy
 
-def db_bphy_div_dC_phy(C_phy: float = 0, 
-           wavelengths: np.array = np.arange(400,800), 
+def db_bphy_div_dC_phy(wavelengths: np.array = np.arange(400,800), 
            b_bphy_spec: float = 0.0010,           
            b_phy_norm_res: np.array = []):
     """
@@ -157,8 +156,7 @@ def b_bX(C_X: float = 0,
     
     return b_bX
 
-def db_bX_div_dC_X(C_X: float = 0,
-         wavelengths: np.array = np.arange(400,800),
+def db_bX_div_dC_X(wavelengths: np.array = np.arange(400,800),
          b_bX_spec: float = 0.0086,
          b_bX_norm_factor: float = 1,
          b_X_norm_res = []):
@@ -173,6 +171,7 @@ def db_bX_div_dC_X(C_X: float = 0,
     b_bX_div_C_X = b_bX_spec * b_X_norm
     
     return b_bX_div_C_X
+
 
 def b_bMie(C_Mie: float = 0,
            wavelengths: np.array = np.arange(400,800),
@@ -198,14 +197,15 @@ def b_bMie(C_Mie: float = 0,
     # Math: b_{b,Mie} = C_{Mie} * b_{b,Mie} * (\frac{\lambda}{\lambda_S})^n
     """
     if len(b_Mie_norm_res)==0:
-        b_bMie = C_Mie * b_bMie_spec * ((wavelengths/lambda_S)**n)
+        b_bMie_norm = ((wavelengths/lambda_S)**n)
     else:
-        b_bMie = C_Mie * b_bMie_spec * b_Mie_norm_res
+        b_bMie_norm = b_Mie_norm_res
     
+    b_bMie = C_Mie * b_bMie_spec * b_bMie_norm
+
     return b_bMie
 
-def dbMie_div_dC_Mie(C_Mie: float = 0,
-           wavelengths: np.array = np.arange(400,800),
+def db_Mie_div_dC_Mie(wavelengths: np.array = np.arange(400,800),
            b_bMie_spec: float = 0.0042,
            lambda_S: float = 500, 
            n: float = -1,
@@ -213,28 +213,26 @@ def dbMie_div_dC_Mie(C_Mie: float = 0,
     """
     # Math: \frac{\partial}{\partial C_{Mie}}b_{b,Mie} = \frac{\partial}{\partial C_{Mie}}\left[C_{Mie} * b_{b,Mie} * (\frac{\lambda}{\lambda_S})^n \right] = b_{b,Mie} * (\frac{\lambda}{\lambda_S})^n
     """
-    if len(b_Mie_norm_res)==0:
-        db_bMie_div_dC_Mie = b_bMie_spec * ((wavelengths/lambda_S)**n)
+    if len(b_Mie_norm_res) == 0:
+        b_bMie_norm = (wavelengths/lambda_S)**n
     else:
-        db_bMie_div_dC_Mie = b_bMie_spec * b_Mie_norm_res
-    
+        b_bMie_norm = b_bMie_norm_res
+
+    db_bMie_div_dC_Mie = b_bMie_spec * b_bMie_norm
+
     return db_bMie_div_dC_Mie
 
-def dbMie_div_dn(C_Mie: float = 0,
+def db_Mie_div_dn(C_Mie: float = 0,
            wavelengths: np.array = np.arange(400,800),
            b_bMie_spec: float = 0.0042,
            lambda_S: float = 500, 
-           n: float = -1,
-           b_Mie_norm_res=[]):
+           n: float = -1):
     """
     # Math: \frac{\partial}{\partial n} \left[C_{Mie} * b_{b,Mie} * (\frac{\lambda}{\lambda_S})^n \right] = C_{Mie} * b_{b,Mie} * ln(\frac{\lambda}{\lambda_S}) (\frac{\lambda}{\lambda_S})^n
     """
-    if len(b_Mie_norm_res)==0:
-        b_bMie_div_dn = C_Mie * b_bMie_spec * np.log(wavelengths/lambda_S) * ((wavelengths/lambda_S)**n)
-    else:
-        b_bMie_div_dn = C_Mie * b_bMie_spec * b_Mie_norm_res
-    
+    b_bMie_div_dn = C_Mie * b_bMie_spec * np.log(wavelengths/lambda_S) * ((wavelengths/lambda_S)**n)
     return b_bMie_div_dn
+
 
 def b_bNAP(C_X: float = 0,
            C_Mie: float = 0,
@@ -271,53 +269,37 @@ def b_bNAP(C_X: float = 0,
     
     return b_bNAP
 
-def db_bNAP_div_dC_X(C_X: float = 0,
-           C_Mie: float = 0,
-           wavelengths: np.array = np.arange(400,800),
-           b_bMie_spec: float = 0.0042,
-           lambda_S: float = 500, 
-           n: float = -1,
+def db_bNAP_div_dC_X(wavelengths: np.array = np.arange(400,800),
            b_bX_spec: float = 0.0086,
            b_bX_norm_factor: float = 1,
-           b_X_norm_res: np.array = [],
-           b_Mie_norm_res: np.array = []):
+           b_X_norm_res: np.array = []):
     """
     # Math: b_{b,NAP} = b_{b,X} + b_{b,Mie}
     # Math: \frac{\partial}{\partial C_X}b_{b,NAP} = \frac{\partial}{\partial C_X}b_{b,X}
     """
-    return db_bX_div_dC_X(C_X=C_X, wavelengths=wavelengths, b_bX_spec=b_bX_spec, b_bX_norm_factor=b_bX_norm_factor, b_X_norm_res=b_X_norm_res)
+    return db_bX_div_dC_X(wavelengths=wavelengths, b_bX_spec=b_bX_spec, b_bX_norm_factor=b_bX_norm_factor, b_X_norm_res=b_X_norm_res)
 
-def db_bNAP_div_dC_Mie(C_X: float = 0,
-           C_Mie: float = 0,
-           wavelengths: np.array = np.arange(400,800),
+def db_bNAP_div_dC_Mie(wavelengths: np.array = np.arange(400,800),
            b_bMie_spec: float = 0.0042,
            lambda_S: float = 500, 
-           n: float = -1,
-           b_bX_spec: float = 0.0086,
-           b_bX_norm_factor: float = 1,
-           b_X_norm_res: np.array = [],
-           b_Mie_norm_res: np.array = []):
+           n=-1):
     """
     # Math: b_{b,NAP} = b_{b,X} + b_{b,Mie}
     # Math: \frac{\partial}{\partial C_{Mie}}b_{b,NAP} = \frac{\partial}{\partial C_{Mie}}b_{b,Mie}
     """
-    return dbMie_div_dC_Mie(C_Mie=C_Mie, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, b_Mie_norm_res=b_Mie_norm_res)
+    return db_Mie_div_dC_Mie(wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n)
 
-def db_NAP_div_dn(C_X: float = 0,
-           C_Mie: float = 0,
+def db_NAP_div_dn(C_Mie: float = 0,
            wavelengths: np.array = np.arange(400,800),
            b_bMie_spec: float = 0.0042,
            lambda_S: float = 500, 
-           n: float = -1,
-           b_bX_spec: float = 0.0086,
-           b_bX_norm_factor: float = 1,
-           b_X_norm_res: np.array = [],
-           b_Mie_norm_res: np.array = []):
+           n: float = -1):
     """
     # Math: b_{b,NAP} = b_{b,X} + b_{b,Mie}
     # Math: \frac{\partial}{\partial n}b_{b,NAP} = \frac{\partial}{\partial n}b_{b,Mie}
     """
-    return dbMie_div_dn(C_Mie=C_Mie, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, b_Mie_norm_res=b_Mie_norm_res)
+    return db_Mie_div_dn(C_Mie=C_Mie, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n)
+
 
 def b_b(C_X: float = 0,
         C_Mie: float = 0,
@@ -366,95 +348,50 @@ def b_b(C_X: float = 0,
     
     return b_b
 
-
-def db_b_div_dC_X(C_X: float = 0,
-        C_Mie: float = 0,
-        C_phy: float  = 0,
-        wavelengths: np.array = np.arange(400,800),
-        fresh: bool = True,
-        b_bMie_spec: float = 0.0042,
-        lambda_S: float = 500, 
-        n: float = -1,
+def db_b_div_dC_X(wavelengths: np.array = np.arange(400,800),
         b_bX_spec: float = 0.0086,
         b_bX_norm_factor: float = 1,
-        b_bphy_spec: float = 0.0010,
-        b_bw_res: np.array = [],
-        b_phy_norm_res: np.array = [],
-        b_X_norm_res=[],
-        b_Mie_norm_res=[]
+        b_X_norm_res=[]
         ):
     """
     # Math: \frac{\partial}{\partial C_X} b_b(\lambda) = \frac{\partial}{\partial C_X} \left[ b_{b,w}(\lambda) + b_{b, phy}(\lambda) + b_{b, NAP}(\lambda) \right] = \frac{\partial}{\partial C_X}b_{b,NAP}(\lambda)
     """  
-    db_b_div_dC_X = db_bNAP_div_dC_X(C_Mie=C_Mie, C_X=C_X, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n, b_bX_spec=b_bX_spec, b_bX_norm_factor=b_bX_norm_factor, b_X_norm_res=b_X_norm_res, b_Mie_norm_res=b_Mie_norm_res)
+    db_b_div_dC_X = db_bNAP_div_dC_X(wavelengths=wavelengths, b_bX_spec=b_bX_spec, b_bX_norm_factor=b_bX_norm_factor, b_X_norm_res=b_X_norm_res)
     
     return db_b_div_dC_X
 
-def db_b_div_dC_Mie(C_X: float = 0,
-        C_Mie: float = 0,
-        C_phy: float  = 0,
-        wavelengths: np.array = np.arange(400,800),
-        fresh: bool = True,
+def db_b_div_dC_Mie(wavelengths: np.array = np.arange(400,800),
+        n=-1,
         b_bMie_spec: float = 0.0042,
         lambda_S: float = 500, 
-        n: float = -1,
-        b_bX_spec: float = 0.0086,
-        b_bX_norm_factor: float = 1,
-        b_bphy_spec: float = 0.0010,
-        b_bw_res: np.array = [],
-        b_phy_norm_res: np.array = [],
-        b_X_norm_res=[],
-        b_Mie_norm_res=[]
         ):
     """
     # Math: \frac{\partial}{\partial C_{Mie}} b_b(\lambda) = \frac{\partial}{\partial C_{Mie}} \left[ b_{b,w}(\lambda) + b_{b, phy}(\lambda) + b_{b, NAP}(\lambda) \right] = \frac{\partial}{\partial C_{Mie}}b_{b,NAP}(\lambda)
     """  
-    db_b_div_dC_Mie = db_bNAP_div_dC_Mie(C_Mie=C_Mie, C_X=C_X, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n, b_bX_spec=b_bX_spec, b_bX_norm_factor=b_bX_norm_factor, b_X_norm_res=b_X_norm_res, b_Mie_norm_res=b_Mie_norm_res)    
+    db_b_div_dC_Mie = db_bNAP_div_dC_Mie(wavelengths=wavelengths, n=n, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S)
 
     return db_b_div_dC_Mie
 
-def db_b_div_dn(C_X: float = 0,
-    C_Mie: float = 0,
-    C_phy: float  = 0,
+def db_b_div_dn(C_Mie: float = 0,
     wavelengths: np.array = np.arange(400,800),
-    fresh: bool = True,
     b_bMie_spec: float = 0.0042,
     lambda_S: float = 500, 
     n: float = -1,
-    b_bX_spec: float = 0.0086,
-    b_bX_norm_factor: float = 1,
-    b_bphy_spec: float = 0.0010,
-    b_bw_res: np.array = [],
-    b_phy_norm_res: np.array = [],
-    b_X_norm_res=[],
-    b_Mie_norm_res=[]
     ):
     """
     # Math: \frac{\partial}{\partial n} b_b(\lambda) = \frac{\partial}{\partial n} \left[ b_{b,w}(\lambda) + b_{b, phy}(\lambda) + b_{b, NAP}(\lambda) \right] = \frac{\partial}{\partial n}b_{b,NAP}(\lambda)
     """  
-    db_b_div_dn = db_NAP_div_dn(C_Mie=C_Mie, C_X=C_X, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n, b_bX_spec=b_bX_spec, b_bX_norm_factor=b_bX_norm_factor, b_X_norm_res=b_X_norm_res, b_Mie_norm_res=b_Mie_norm_res)
+    db_b_div_dn = db_NAP_div_dn(C_Mie=C_Mie, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n)
     
     return db_b_div_dn
 
-def db_b_div_dC_phy(C_X: float = 0,
-        C_Mie: float = 0,
-        C_phy: float  = 0,
-        wavelengths: np.array = np.arange(400,800),
-        fresh: bool = True,
-        b_bMie_spec: float = 0.0042,
-        lambda_S: float = 500, 
-        n: float = -1,
-        b_bX_spec: float = 0.0086,
-        b_bX_norm_factor: float = 1,
+def db_b_div_dC_phy(wavelengths: np.array = np.arange(400,800),
         b_bphy_spec: float = 0.0010,
-        b_bw_res: np.array = [],
         b_phy_norm_res: np.array = [],
-        b_X_norm_res=[],
-        b_Mie_norm_res=[]
         ):
     """
     # Math: \frac{\partial}{\partial C_{phy}} b_b(\lambda) = \frac{\partial}{\partial C_{phy}} \left[ b_{b,w}(\lambda) + b_{b, phy}(\lambda) + b_{b, NAP}(\lambda) \right] = \frac{\partial}{\partial C_{phy}}b_{b,phy}(\lambda)
     """  
-    db_b_div_dC_phy = db_bphy_div_dC_phy(wavelengths=wavelengths, C_phy=C_phy, b_bphy_spec=b_bphy_spec, b_phy_norm_res=b_phy_norm_res)
+    db_b_div_dC_phy = db_bphy_div_dC_phy(wavelengths=wavelengths, b_bphy_spec=b_bphy_spec, b_phy_norm_res=b_phy_norm_res)
     
     return db_b_div_dC_phy

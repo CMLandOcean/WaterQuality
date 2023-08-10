@@ -38,7 +38,7 @@
 
 
 import numpy as np
-from lmfit import minimize, Parameters
+from lmfit import Minimizer, Parameters
 from .. water import absorption, backscattering, temperature_gradient, attenuation, bottom_reflectance
 from .. surface import surface, air_water
 from .. helper import resampling
@@ -60,12 +60,46 @@ def r_rs_dp(u,
     :param n1: refrective index of origin medium, default: 1 for air
     :param n2: refrective index of destination medium, default: 1.33 for water
     :return: subsurface radiance reflectance of deep water [sr-1]
+
+    # Math: r_{rs}^{deep-} = f_{rs} * \omega_b(\lambda)
+    # Math: f_{rs}(\lambda) = 0.0512 * (1 + 4.6659 * \omega_b(\lambda) - 7.8387 * \omega_b(\lambda)^2 + 5.4571 * \omega_b(\lambda)^3) * \left( 1 + \frac{0.1098}{cos\theta_{sun}'} \right) * \left( 1 + \frac{0.4021}{cos\theta_v'} \right)
     """    
     f_rs = 0.0512 * (1 + 4.6659 * u - 7.8387 * u**2 + 5.4571 * u**3) * (1 + 0.1098/np.cos(air_water.snell(theta_sun, n1, n2))) * (1 + 0.4021/np.cos(air_water.snell(theta_view, n1, n2)))
     r_rs_dp = f_rs * u
     
     return r_rs_dp
 
+# def dr_rs_dp_div_dC_i(i, 
+#             du_div_dC_i, 
+#             theta_sun=np.radians(30), 
+#             theta_view=np.radians(0), 
+#             n1=1, 
+#             n2=1.33):
+#     """
+#     # Math: \frac{\partial}{\partial p_i} \left[f_{rs} * \omega_b \right] = \frac{\partial}{\partial p_i}f_rs * \omega_b + f_{rs} * \frac{\partial}{\partial p_i}\omega_b
+#     """
+
+
+# def dr_rs_dp_div_dC_x():
+#
+# 
+# def dr_rs_dp_div_dC_Y():
+#
+# 
+# def dr_rs_dp_div_dC_Mie():
+#
+# 
+# def dr_rs_dp_div_dS():
+#
+# 
+# def dr_rs_dp_div_dS_NAP():
+#
+# 
+# def dr_rs_dp_div_dn():
+#
+# 
+# def dr_rs_dp_div_dC_phy():
+#
 
 def r_rs_sh(C_0 = 0,
             C_1 = 0,
@@ -180,6 +214,8 @@ def r_rs_sh(C_0 = 0,
     :param R_i_b_res: optional, preresampling R_i_b before inversion saves a lot of time. Will be computed within function if not provided.
     :param da_W_div_dT_res: optional, temperature gradient of pure water absorption resampled  to sensor's band settings. Will be computed within function if not provided.
     :return: subsurface radiance reflectance of shallow water [sr-1]
+
+    # Math: r_{rs}^{sh-}(\lambda) = r_{rs}^{deep-} * \left[1 - A_{rs,1} * exp\{-(K_d(\lambda) + k_{uw}(\lambda)) * zB\} \right] + A_{rs,2} * R_{rs}^b(\lambda) * exp\{-(K_d(\lambda) + k_{ub}(\lambda)) * zB \}
     """
     # Backscattering and absorption coefficients of the water body depending on the concentration of optically active water constituents
     bs = backscattering.b_b(C_X=C_X,
@@ -240,11 +276,39 @@ def r_rs_sh(C_0 = 0,
                np.exp(-(diffuse_attenuation + k_uB) * zB))
 
     return r_rs_sh
-    
 
-# Inversion
-    
-def func2opt(params, 
+# def dr_rs_sh_div_dC_i():
+#
+# 
+# def dr_rs_sh_div_dC_x():
+#
+# 
+# def dr_rs_sh_div_dC_Y():
+#
+# 
+# def dr_rs_sh_div_dC_Mie():
+#
+# 
+# def dr_rs_sh_div_dS():
+#
+# 
+# def dr_rs_sh_div_dS_NAP():
+#
+# 
+# def dr_rs_sh_div_dn():
+#
+# 
+# def dr_rs_sh_div_dC_phy():
+#
+# 
+# def dr_rs_sh_div_df_i():
+#
+# 
+# def dr_rs_sh_div_dB_i():
+#
+#
+
+def residual(params, 
              R_rs,
              wavelengths, 
              weights = [],
@@ -292,154 +356,41 @@ def func2opt(params,
     :param E_dsr_res: optional, preresampling E_dsr before inversion saves a lot of time. Will be computed within function if not provided.
     :param E_d_res: optional, preresampling E_d before inversion saves a lot of time. Will be computed within function if not provided.
     :return: weighted difference between measured and simulated R_rs
+
+    # Math: L_i = R_{rs}(\lambda_i) - R_{rs_{sim}}(\lambda_i)
     """
     
     if len(weights)==0:
         weights = np.ones(len(wavelengths))
     
-    if params['fit_surface'] == True:
+    R_rs_sim = fwd(params,
+             wavelengths, 
+             weights = [],
+             a_i_spec_res=[],
+             a_w_res=[],
+             a_Y_N_res = [],
+             a_NAP_N_res = [],
+             b_phy_norm_res = [],
+             b_bw_res = [],
+             b_X_norm_res=[],
+             b_Mie_norm_res=[],
+             R_i_b_res = [],
+             da_W_div_dT_res=[],
+             E_0_res=[],
+             a_oz_res=[],
+             a_ox_res=[],
+             a_wv_res=[],
+             E_dd_res=[],
+             E_dsa_res=[],
+             E_dsr_res=[],
+             E_d_res=[])
     
-        R_rs_sim = air_water.below2above(
-                            r_rs_sh(C_0 = params['C_0'],
-                                    C_1 = params['C_1'],
-                                    C_2 = params['C_2'],
-                                    C_3 = params['C_3'],
-                                    C_4 = params['C_4'],
-                                    C_5 = params['C_5'],
-                                    C_Y = params['C_Y'],
-                                    C_X = params['C_X'],
-                                    C_Mie = params['C_Mie'],
-                                    f_0 = params['f_0'],
-                                    f_1 = params['f_1'],
-                                    f_2 = params['f_2'],
-                                    f_3 = params['f_3'],
-                                    f_4 = params['f_4'],
-                                    f_5 = params['f_5'],
-                                    B_0 = params['B_0'],
-                                    B_1 = params['B_1'],
-                                    B_2 = params['B_2'],
-                                    B_3 = params['B_3'],
-                                    B_4 = params['B_4'],
-                                    B_5 = params['B_5'],
-                                    b_bphy_spec = params['b_bphy_spec'],
-                                    b_bMie_spec = params['b_bMie_spec'],
-                                    b_bX_spec = params['b_bX_spec'],
-                                    b_bX_norm_factor = params['b_bX_norm_factor'],
-                                    a_NAP_spec_lambda_0 = params['a_NAP_spec_lambda_0'],
-                                    S = params['S'],
-                                    K = params['K'],
-                                    S_NAP = params['S_NAP'],
-                                    n = params['n'],
-                                    lambda_0 = params['lambda_0'],
-                                    lambda_S = params['lambda_S'],
-                                    theta_sun = params['theta_sun'],
-                                    theta_view = params['theta_view'],
-                                    n1 = params['n1'],
-                                    n2 = params['n2'],
-                                    kappa_0 = params["kappa_0"],
-                                    fresh = params["fresh"],
-                                    T_W = params["T_W"],
-                                    T_W_0 = params["T_W_0"],
-                                    zB = params['zB'],
-                                    wavelengths = wavelengths,
-                                    a_i_spec_res=a_i_spec_res,
-                                    a_w_res=a_w_res,
-                                    a_Y_N_res = a_Y_N_res,
-                                    a_NAP_N_res = a_NAP_N_res,
-                                    b_phy_norm_res=b_phy_norm_res,
-                                    b_bw_res=b_bw_res,
-                                    b_X_norm_res=b_X_norm_res,
-                                    b_Mie_norm_res=b_Mie_norm_res,
-                                    R_i_b_res=R_i_b_res,
-                                    da_W_div_dT_res=da_W_div_dT_res))  + \
-                            surface.R_rs_surf(wavelengths = wavelengths, 
-                                              theta_sun=params['theta_sun'], 
-                                              P=params['P'], 
-                                              AM=params['AM'], 
-                                              RH=params['RH'], 
-                                              H_oz=params['H_oz'], 
-                                              WV=params['WV'], 
-                                              alpha=params['alpha'],
-                                              beta=params['beta'],
-                                              g_dd=params['g_dd'],
-                                              g_dsr=params['g_dsr'],
-                                              g_dsa=params['g_dsa'],
-                                              f_dd=params['f_dd'], 
-                                              f_ds=params['f_ds'],
-                                              rho_L=params['rho_L'],
-                                              E_0_res=E_0_res,
-                                              a_oz_res=a_oz_res,
-                                              a_ox_res=a_ox_res,
-                                              a_wv_res=a_wv_res,
-                                              E_dd_res=E_dd_res,
-                                              E_dsa_res=E_dsa_res,
-                                              E_dsr_res=E_dsr_res,
-                                              E_d_res=E_d_res) + \
-                            params['offset']
-                    
-    elif params['fit_surface']==False:
-
-        R_rs_sim = air_water.below2above(
-                            r_rs_sh(C_0 = params['C_0'],
-                                    C_1 = params['C_1'],
-                                    C_2 = params['C_2'],
-                                    C_3 = params['C_3'],
-                                    C_4 = params['C_4'],
-                                    C_5 = params['C_5'],
-                                    C_Y = params['C_Y'],
-                                    C_X = params['C_X'],
-                                    C_Mie = params['C_Mie'],
-                                    f_0 = params['f_0'],
-                                    f_1 = params['f_1'],
-                                    f_2 = params['f_2'],
-                                    f_3 = params['f_3'],
-                                    f_4 = params['f_4'],
-                                    f_5 = params['f_5'],
-                                    B_0 = params['B_0'],
-                                    B_1 = params['B_1'],
-                                    B_2 = params['B_2'],
-                                    B_3 = params['B_3'],
-                                    B_4 = params['B_4'],
-                                    B_5 = params['B_5'],
-                                    b_bphy_spec = params['b_bphy_spec'],
-                                    b_bMie_spec = params['b_bMie_spec'],
-                                    b_bX_spec = params['b_bX_spec'],
-                                    b_bX_norm_factor = params['b_bX_norm_factor'],
-                                    a_NAP_spec_lambda_0 = params['a_NAP_spec_lambda_0'],
-                                    S = params['S'],
-                                    K = params['K'],
-                                    S_NAP = params['S_NAP'],
-                                    n = params['n'],
-                                    lambda_0 = params['lambda_0'],
-                                    lambda_S = params['lambda_S'],
-                                    theta_sun = params['theta_sun'],
-                                    theta_view = params['theta_view'],
-                                    n1 = params['n1'],
-                                    n2 = params['n2'],
-                                    kappa_0 = params["kappa_0"],
-                                    fresh = params["fresh"],
-                                    T_W = params["T_W"],
-                                    T_W_0 = params["T_W_0"],
-                                    zB = params['zB'],
-                                    wavelengths = wavelengths,
-                                    a_i_spec_res=a_i_spec_res,
-                                    a_w_res=a_w_res,
-                                    a_Y_N_res = a_Y_N_res,
-                                    a_NAP_N_res = a_NAP_N_res,
-                                    b_phy_norm_res=b_phy_norm_res,
-                                    b_bw_res=b_bw_res,
-                                    b_X_norm_res=b_X_norm_res,
-                                    b_Mie_norm_res=b_Mie_norm_res,
-                                    R_i_b_res=R_i_b_res,
-                                    da_W_div_dT_res=da_W_div_dT_res)) + \
-                            params['offset']
-    
-    # absolute differences
-    err = np.abs(R_rs-R_rs_sim) * weights
+    # sum absolute differences
+    err = (R_rs-R_rs_sim) * weights
         
     return err
-    
-    
+
+
 def invert(params, 
            R_rs, 
            wavelengths,
@@ -463,8 +414,8 @@ def invert(params,
            E_dsr_res=[],
            E_d_res=[],
            method="least-squares", 
-           max_nfev=400
-           ):
+           max_nfev=400,
+           jac="2-point"):
     """
     Function to inversely fit a modeled spectrum to a measurement spectrum.
     
@@ -496,9 +447,9 @@ def invert(params,
     """    
     
     if params['fit_surface']==True:
-        res = minimize(func2opt, 
+        min = Minimizer(residual, 
                        params, 
-                       args=(R_rs, 
+                       fcn_args=(R_rs, 
                              wavelengths, 
                              weights, 
                              a_i_spec_res, 
@@ -519,8 +470,7 @@ def invert(params,
                              E_dsa_res,
                              E_dsr_res,
                              E_d_res), 
-                       method=method, 
-                       max_nfev=max_nfev) 
+                       max_nfev=max_nfev)
                        
     elif params['fit_surface']==False:
 
@@ -538,9 +488,9 @@ def invert(params,
         params.add('f_ds', vary=False) 
         params.add('rho_L', vary=False) 
 
-        res = minimize(func2opt, 
+        min = Minimizer(residual, 
                        params, 
-                       args=(R_rs, 
+                       fcn_args=(R_rs, 
                              wavelengths, 
                              weights, 
                              a_i_spec_res, 
@@ -552,13 +502,15 @@ def invert(params,
                              b_X_norm_res, 
                              b_Mie_norm_res, 
                              R_i_b_res, 
-                             da_W_div_dT_res), 
-                       method=method, 
+                             da_W_div_dT_res),
                        max_nfev=max_nfev) 
+        
+    res = min.least_squares(jac=jac)
+    
     return res
 
 
-def forward(params,
+def fwd(params,
             wavelengths,
             weights=[],
             a_i_spec_res=[],
@@ -604,142 +556,193 @@ def forward(params,
     :param E_d_res: optional, precomputing E_d saves a lot of time. Will be computed within function if not provided.
     :return: R_rs: simulated remote sensing reflectance spectrum [sr-1]
     """
-    
-    if params['fit_surface']==True:
         
-        R_rs_sim = air_water.below2above(
-                            r_rs_sh(C_0 = params['C_0'],
-                                    C_1 = params['C_1'],
-                                    C_2 = params['C_2'],
-                                    C_3 = params['C_3'],
-                                    C_4 = params['C_4'],
-                                    C_5 = params['C_5'],
-                                    C_Y = params['C_Y'],
-                                    C_X = params['C_X'],
-                                    C_Mie = params['C_Mie'],
-                                    f_0 = params['f_0'],
-                                    f_1 = params['f_1'],
-                                    f_2 = params['f_2'],
-                                    f_3 = params['f_3'],
-                                    f_4 = params['f_4'],
-                                    f_5 = params['f_5'],
-                                    B_0 = params['B_0'],
-                                    B_1 = params['B_1'],
-                                    B_2 = params['B_2'],
-                                    B_3 = params['B_3'],
-                                    B_4 = params['B_4'],
-                                    B_5 = params['B_5'],
-                                    b_bphy_spec = params['b_bphy_spec'],
-                                    b_bMie_spec = params['b_bMie_spec'],
-                                    b_bX_spec = params['b_bX_spec'],
-                                    b_bX_norm_factor = params['b_bX_norm_factor'],
-                                    a_NAP_spec_lambda_0 = params['a_NAP_spec_lambda_0'],
-                                    S = params['S'],
-                                    K = params['K'],
-                                    S_NAP = params['S_NAP'],
-                                    n = params['n'],
-                                    lambda_0 = params['lambda_0'],
-                                    lambda_S = params['lambda_S'],
-                                    theta_sun = params['theta_sun'],
-                                    theta_view = params['theta_view'],
-                                    n1 = params['n1'],
-                                    n2 = params['n2'],
-                                    kappa_0 = params["kappa_0"],
-                                    fresh = params["fresh"],
-                                    T_W = params["T_W"],
-                                    T_W_0 = params["T_W_0"],
-                                    zB = params['zB'],
-                                    wavelengths = wavelengths,
-                                    a_i_spec_res=a_i_spec_res,
-                                    a_w_res=a_w_res,
-                                    a_Y_N_res = a_Y_N_res,
-                                    a_NAP_N_res = a_NAP_N_res,
-                                    b_phy_norm_res=b_phy_norm_res,
-                                    b_bw_res=b_bw_res,
-                                    b_X_norm_res=b_X_norm_res,
-                                    b_Mie_norm_res=b_Mie_norm_res,
-                                    R_i_b_res=R_i_b_res,
-                                    da_W_div_dT_res=da_W_div_dT_res)) + \
-                            surface.R_rs_surf(wavelengths = wavelengths, 
-                                              theta_sun=params['theta_sun'], 
-                                              P=params['P'], 
-                                              AM=params['AM'], 
-                                              RH=params['RH'], 
-                                              H_oz=params['H_oz'], 
-                                              WV=params['WV'], 
-                                              alpha=params['alpha'],
-                                              beta=params['beta'],
-                                              g_dd=params['g_dd'],
-                                              g_dsr=params['g_dsr'],
-                                              g_dsa=params['g_dsa'],
-                                              f_dd=params['f_dd'], 
-                                              f_ds=params['f_ds'],
-                                              rho_L=params['rho_L'],
-                                              E_0_res=E_0_res,
-                                              a_oz_res=a_oz_res,
-                                              a_ox_res=a_ox_res,
-                                              a_wv_res=a_wv_res,
-                                              E_dd_res=E_dd_res,
-                                              E_dsa_res=E_dsa_res,
-                                              E_dsr_res=E_dsr_res,
-                                              E_d_res=E_d_res) + \
-                            params['offset']
-                            
-    elif params['fit_surface']==False:
+    R_rs_sim = air_water.below2above(
+                        r_rs_sh(C_0 = params['C_0'],
+                                C_1 = params['C_1'],
+                                C_2 = params['C_2'],
+                                C_3 = params['C_3'],
+                                C_4 = params['C_4'],
+                                C_5 = params['C_5'],
+                                C_Y = params['C_Y'],
+                                C_X = params['C_X'],
+                                C_Mie = params['C_Mie'],
+                                f_0 = params['f_0'],
+                                f_1 = params['f_1'],
+                                f_2 = params['f_2'],
+                                f_3 = params['f_3'],
+                                f_4 = params['f_4'],
+                                f_5 = params['f_5'],
+                                B_0 = params['B_0'],
+                                B_1 = params['B_1'],
+                                B_2 = params['B_2'],
+                                B_3 = params['B_3'],
+                                B_4 = params['B_4'],
+                                B_5 = params['B_5'],
+                                b_bphy_spec = params['b_bphy_spec'],
+                                b_bMie_spec = params['b_bMie_spec'],
+                                b_bX_spec = params['b_bX_spec'],
+                                b_bX_norm_factor = params['b_bX_norm_factor'],
+                                a_NAP_spec_lambda_0 = params['a_NAP_spec_lambda_0'],
+                                S = params['S'],
+                                K = params['K'],
+                                S_NAP = params['S_NAP'],
+                                n = params['n'],
+                                lambda_0 = params['lambda_0'],
+                                lambda_S = params['lambda_S'],
+                                theta_sun = params['theta_sun'],
+                                theta_view = params['theta_view'],
+                                n1 = params['n1'],
+                                n2 = params['n2'],
+                                kappa_0 = params["kappa_0"],
+                                fresh = params["fresh"],
+                                T_W = params["T_W"],
+                                T_W_0 = params["T_W_0"],
+                                zB = params['zB'],
+                                wavelengths = wavelengths,
+                                a_i_spec_res=a_i_spec_res,
+                                a_w_res=a_w_res,
+                                a_Y_N_res = a_Y_N_res,
+                                a_NAP_N_res = a_NAP_N_res,
+                                b_phy_norm_res=b_phy_norm_res,
+                                b_bw_res=b_bw_res,
+                                b_X_norm_res=b_X_norm_res,
+                                b_Mie_norm_res=b_Mie_norm_res,
+                                R_i_b_res=R_i_b_res,
+                                da_W_div_dT_res=da_W_div_dT_res))
+    if params['fit_surface']==True:
+        R_rs_sim += surface.R_rs_surf(wavelengths = wavelengths, 
+                                      theta_sun=params['theta_sun'], 
+                                      P=params['P'], 
+                                      AM=params['AM'], 
+                                      RH=params['RH'], 
+                                      H_oz=params['H_oz'], 
+                                      WV=params['WV'], 
+                                      alpha=params['alpha'],
+                                      beta=params['beta'],
+                                      g_dd=params['g_dd'],
+                                      g_dsr=params['g_dsr'],
+                                      g_dsa=params['g_dsa'],
+                                      f_dd=params['f_dd'], 
+                                      f_ds=params['f_ds'],
+                                      rho_L=params['rho_L'],
+                                      E_0_res=E_0_res,
+                                      a_oz_res=a_oz_res,
+                                      a_ox_res=a_ox_res,
+                                      a_wv_res=a_wv_res,
+                                      E_dd_res=E_dd_res,
+                                      E_dsa_res=E_dsa_res,
+                                      E_dsr_res=E_dsr_res,
+                                      E_d_res=E_d_res)
+    else:
+        R_rs_sim += params['offset']
 
-        R_rs_sim = air_water.below2above(
-                            r_rs_sh(C_0 = params['C_0'],
-                                    C_1 = params['C_1'],
-                                    C_2 = params['C_2'],
-                                    C_3 = params['C_3'],
-                                    C_4 = params['C_4'],
-                                    C_5 = params['C_5'],
-                                    C_Y = params['C_Y'],
-                                    C_X = params['C_X'],
-                                    C_Mie = params['C_Mie'],
-                                    f_0 = params['f_0'],
-                                    f_1 = params['f_1'],
-                                    f_2 = params['f_2'],
-                                    f_3 = params['f_3'],
-                                    f_4 = params['f_4'],
-                                    f_5 = params['f_5'],
-                                    B_0 = params['B_0'],
-                                    B_1 = params['B_1'],
-                                    B_2 = params['B_2'],
-                                    B_3 = params['B_3'],
-                                    B_4 = params['B_4'],
-                                    B_5 = params['B_5'],
-                                    b_bphy_spec = params['b_bphy_spec'],
-                                    b_bMie_spec = params['b_bMie_spec'],
-                                    b_bX_spec = params['b_bX_spec'],
-                                    b_bX_norm_factor = params['b_bX_norm_factor'],
-                                    a_NAP_spec_lambda_0 = params['a_NAP_spec_lambda_0'],
-                                    S = params['S'],
-                                    K = params['K'],
-                                    S_NAP = params['S_NAP'],
-                                    n = params['n'],
-                                    lambda_0 = params['lambda_0'],
-                                    lambda_S = params['lambda_S'],
-                                    theta_sun = params['theta_sun'],
-                                    theta_view = params['theta_view'],
-                                    n1 = params['n1'],
-                                    n2 = params['n2'],
-                                    kappa_0 = params["kappa_0"],
-                                    fresh = params["fresh"],
-                                    T_W = params["T_W"],
-                                    T_W_0 = params["T_W_0"],
-                                    zB = params['zB'],
-                                    wavelengths = wavelengths,
-                                    a_i_spec_res=a_i_spec_res,
-                                    a_w_res=a_w_res,
-                                    a_Y_N_res = a_Y_N_res,
-                                    a_NAP_N_res = a_NAP_N_res,
-                                    b_phy_norm_res=b_phy_norm_res,
-                                    b_bw_res=b_bw_res,
-                                    b_X_norm_res=b_X_norm_res,
-                                    b_Mie_norm_res=b_Mie_norm_res,
-                                    R_i_b_res=R_i_b_res,
-                                    da_W_div_dT_res=da_W_div_dT_res)) + \
-                            params['offset']
-                            
     return R_rs_sim
+
+def dfwd_div_dC_i():
+    pass
+
+# def dfwd_div_dC_X():
+#
+# 
+# def dfwd_div_dC_Y():
+#
+# 
+# def dfwd_div_dC_Mie():
+#
+# 
+# def dfwd_div_dS():
+#
+# 
+# def dfwd_div_dS_NAP():
+#
+# 
+# def dfwd_div_dn():
+#
+# 
+# def dfwd_div_dC_phy():
+#
+# 
+# def dfwd_div_df_i():
+#
+# 
+# def dfwd_div_dB_i():
+#
+#
+
+def wrap(outerfunc, *outer_args, **outer_kwargs):
+      def inner_func(*inner_args, **inner_kwargs):
+            args = list(outer_args) + list(inner_args)
+            kwargs = {**outer_kwargs, **inner_kwargs}
+            return outerfunc(*args, **kwargs)
+      return inner_func
+
+def build_jac(params):
+    """
+    Returns the Jacobian function.
+    The Jacobian function must be passed to lmfit minimizer
+    i.e.
+      jac = build_jac(params)
+      invert(fun=fun, jac=jac, params,...
+    """
+    fun_list = []
+
+    if 'C_0' in params and params['C_0']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 0))
+    if 'C_1' in params and params['C_0']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 1))
+    if 'C_2' in params and params['C_0']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 2))
+    if 'C_3' in params and params['C_0']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 3))
+    if 'C_4' in params and params['C_0']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 4))
+    if 'C_5' in params and params['C_0']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 5))
+    
+    if 'C_X' in params and params['X']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 5))
+    if 'C_Y' in params and params['Y']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 5))
+    if 'C_Mie' in params and params['C_Mie']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 5))
+    if 'S' in params and params['S']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 5))
+    if 'S_NAP' in params and params['S_NAP']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 5))
+    if 'n' in params and params['n']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 5))
+    if 'C_phy' in params and params['C_phy']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dC_i, 5))
+    
+    if 'f_0' in params and params['f_0']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_df_i, 0))
+    if 'f_1' in params and params['f_1']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_df_i, 1))
+    if 'f_2' in params and params['f_2']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_df_i, 2))
+    if 'f_3' in params and params['f_3']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_df_i, 3))
+    if 'f_4' in params and params['f_4']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_df_i, 4))
+    if 'f_5' in params and params['f_5']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_df_i, 5))
+
+    if 'B_0' in params and params['B_0']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dB_i, 0))
+    if 'B_1' in params and params['B_1']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dB_i, 1))
+    if 'B_2' in params and params['B_2']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dB_i, 2))
+    if 'B_3' in params and params['B_3']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dB_i, 3))
+    if 'B_4' in params and params['B_4']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dB_i, 4))
+    if 'B_5' in params and params['B_5']['vary'] == True:
+        fun_list.append(wrap(dfwd_div_dB_i, 5))
+    
+
+    def eval_jac(*args, **kwargs):
+        return np.array([fun(*args, **kwargs) for fun in fun_list]).T
+        
+    return eval_jac
