@@ -83,7 +83,8 @@ def R_rs_b(f_0 = 0,
     
     if len(R_i_b_res)==0:
         R_i_b = resampling.resample_R_i_b(wavelengths=wavelengths)
-    else: R_i_b = R_i_b_res
+    else: 
+        R_i_b = R_i_b_res
     
     R_rs_b = np.sum([f_i[i] * B_i[i] * R_i_b.T[i] for i in np.arange(R_i_b.shape[1])], axis=0)
     

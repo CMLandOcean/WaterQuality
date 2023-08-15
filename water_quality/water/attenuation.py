@@ -41,6 +41,9 @@ import numpy as np
 from .. surface import air_water
 
 def omega_b(a, b_b):
+    """
+    # Math: \omega_b = \frac{b_b}{a + b_b}
+    """
     return b_b / (a + b_b)
 
 def domega_b_div_dp(a, b_b, da_div_dp, db_b_div_dp):
@@ -48,12 +51,15 @@ def domega_b_div_dp(a, b_b, da_div_dp, db_b_div_dp):
     # Math: \frac{\partial}{\partial p}\left[\omega_b\right] = \frac{\partial}{\partial p}\left[ b_b \times (a+b_b)^{-1} \right]
     # Math: =\frac{\partial b_b}{\partial p} (a + b_b)^{-1} - b_b(a+b_b)(\frac{\partial a}{\partial p} + \frac{\partial b_b}{\partial p})
     """
-    return db_b_div_dp / (a + b_b) - b_b * (a + b_b) * (da_div_dp + db_b_div_dp)
+    return (db_b_div_dp / (a + b_b)) - (b_b * (a + b_b) * (da_div_dp + db_b_div_dp))
 
+# Attentuation partials have the same form for all fit params
+# References to theta all invoke cos(theta). Expect np.cos(theta) as param instead.
 def K_d(a,
         b_b, 
-        theta_sun_prime = np.radians(30),
-        kappa_0 = 1.0546):
+        cos_t_sun_p=np.pi/6,
+        kappa_0 = 1.0546,
+        ):
     """
     Diffuse attenuation for downwelling irradiance as implemented in WASI [1].
     
@@ -69,146 +75,71 @@ def K_d(a,
     :return: diffuse attenuation for downwelling irradiance
 
     # Math: K_d(\lambda) = K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'}
-    """   
-    K_d = (kappa_0 / np.cos(theta_sun_prime)) * (a + b_b)
+    """
+    K_d = (kappa_0 / cos_t_sun_p) * (a + b_b)
     
     return K_d
 
-def dK_d_div_dC_i(
-        da_div_dC_i,
-        db_b_div_dC_phy, 
-        theta_sun_prime = np.radians(30),
-        kappa_0 = 1.0546):
+def dK_d_div_dp(da_div_dp,
+                db_b_div_dp,
+                cos_t_sun_p=np.cos(np.pi/6),
+                kappa_0=1.0546):
     """
-    # Math: \frac{\partial}{\partial C_i}K_d(\lambda) = \frac{\partial}{\partial C_i} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial C_i}a
+    # Math: \frac{\partial}{\partial p} \left[ \frac{k_0}{cos \theta_{sun}'} (a + b_b) \right] = \frac{k_0}{cos \theta_{sun}'} (\frac{\partial a}{\partial p} + \frac{\partial b_b}{\partial p})
     """
-    dK_d_div_dC_i = kappa_0 / np.cos(theta_sun_prime) * (da_div_dC_i + db_b_div_dC_phy)
+    return (kappa_0 / cos_t_sun_p) * (da_div_dp + db_b_div_dp)
+    
 
-    return dK_d_div_dC_i
-
-def dK_d_div_dC_Y(
-        da_div_dC_Y,
-        theta_sun_prime = np.radians(30),
-        kappa_0 = 1.0546):
-    """
-    # Math: \frac{\partial}{\partial C_Y}K_d(\lambda) = \frac{\partial}{\partial C_Y} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial C_Y}a
-    """
-    dK_d_div_dC_Y = kappa_0 / np.cos(theta_sun_prime) * da_div_dC_Y
-
-    return dK_d_div_dC_Y
-
-def dK_d_div_dS(
-        da_div_dS,
-        theta_sun_prime = np.radians(30),
-        kappa_0 = 1.0546):
-    """
-    # Math: \frac{\partial}{\partial S}K_d(\lambda) = \frac{\partial}{\partial S} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial S}a
-    """
-    dK_d_div_dS = kappa_0 / np.cos(theta_sun_prime) * da_div_dS
-
-    return dK_d_div_dS
-
-def dK_d_div_dS_NAP(
-        da_div_dS_NAP,
-        theta_sun_prime = np.radians(30),
-        kappa_0 = 1.0546):
-    """
-    # Math: \frac{\partial}{\partial S_{NAP}}K_d(\lambda) = \frac{\partial}{\partial S_{NAP}} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial S_{NAP}}a
-    """
-    dK_d_div_dS_NAP = kappa_0 / np.cos(theta_sun_prime) * da_div_dS_NAP
-
-    return dK_d_div_dS_NAP
-
-def dK_d_div_dC_X(
-        da_div_dC_X,
-        db_b_div_dC_X, 
-        theta_sun_prime = np.radians(30),
-        kappa_0 = 1.0546):
-    """
-    # Math: \frac{\partial}{\partial C_X}K_d(\lambda) = \frac{\partial}{\partial C_X} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} (\frac{\partial}{\partial C_X}a + \frac{\partial}{\partial C_X}b_b)
-    """
-    dK_d_div_dC_X = (kappa_0 / np.cos(theta_sun_prime)) * (da_div_dC_X + db_b_div_dC_X)
-
-    return dK_d_div_dC_X
-
-def dK_d_div_dC_Mie(
-        da_div_dC_Mie,
-        db_b_div_dC_Mie, 
-        theta_sun_prime = np.radians(30),
-        kappa_0 = 1.0546):
-    """
-    # Math: \frac{\partial}{\partial C_{Mie}}K_d(\lambda) = \frac{\partial}{\partial C_{Mie}} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} (\frac{\partial}{\partial C_{Mie}}a + \frac{\partial}{\partial C_{Mie}}b_b)
-    """
-    dK_d_div_dC_Mie = (kappa_0 / np.cos(theta_sun_prime)) * (da_div_dC_Mie + db_b_div_dC_Mie)
-
-    return dK_d_div_dC_Mie
-
-def dK_d_div_dn(
-        a,
-        db_b_div_dn, 
-        theta_sun_prime = np.radians(30),
-        kappa_0 = 1.0546):
-    """
-    # Math: \frac{\partial}{\partial n}K_d(\lambda) = \frac{\partial}{\partial n} \left[ K_0 \frac{a(\lambda) + b_b(\lambda)}{cos\theta_{sun}'} \right] = \frac{K_0}{cos\theta_{sum}'} \frac{\partial}{\partial n}b_b
-    """
-    dK_d_div_dn = kappa_0 / np.cos(theta_sun_prime) * db_b_div_dn
-
-    return dK_d_div_dn
-
-# No partial WRT C_phy since d_x_div_C_phy = d_x_div_C_i
-
-
-# Generalized partial derivatives because these partials have the same form for all fit params
 def k_uW(a,
          b_b,
-         theta_sun_prime,
-         theta_view_prime):
+         cos_t_sun_p,
+         cos_t_view_p):
     """
     # Math: k_{uW} = \frac{a + b_b}{cos \theta_v'} \times (1 + \omega_b)^{3.5421} \times (1 - \frac{0.2786}{cos \theta_{sun}'})
     """
-    return (a + b_b) / np.cos(theta_view_prime) * (1 + omega_b(a, b_b))**3.5421 * (1 - 0.2786 / np.cos(theta_sun_prime))
+    return (a + b_b) / cos_t_sun_p * (1 + omega_b(a, b_b))**3.5421 * (1 - 0.2786 / cos_t_view_p)
 
 def dk_uW_div_dp(a, 
                  b_b, 
                  da_div_dp, 
                  db_b_div_dp, 
-                 theta_sun_prime, 
-                 theta_view_prime):
+                 cos_t_sun_p, 
+                 cos_t_view_p):
     """
     # Math: \frac{\partial}{\partial p}\left[k_{uW}\right] = \frac{\partial}{\partial p}\left[\frac{a + b_b}{cos \theta_v'} \times (1 + \omega_b)^{3.5421} \times (1 - \frac{0.2786}{cos \theta_{sun}'})\right]
     # Math: = \frac{1}{cos \theta_v'}\left[ \frac{\partial}{\partial p}(a + b_b) \times (1 + \omega_b)^{3.5421} + (a + b_b) \times \frac{\partial}{\partial p}((1 + \omega_b)^{3.5421})\right]\times (1 - \frac{0.2786}{cos \theta_{sun}'})
     # Math: = \frac{1}{cos \theta_v'}\left[ (\frac{\partial a}{\partial p} + \frac{\partial b}{\partial p}) \times (1 + \omega_b)^{3.5421} + (a + b) \times (3.5421 \times (1 + \omega_b)^{2.5421} \times \frac{\partial \omega_b}{\partial p}) \right] \times (1 - \frac{0.2786}{cos \theta_{sun}'})
     """
 
-    return 1/np.cos(theta_view_prime) * \
+    return 1/cos_t_sun_p * \
           (((da_div_dp + db_b_div_dp) * (1 + omega_b**(3.5421)) + \
           (a + b_b) * (3.5421 * (1 + omega_b**(2.5421)) * domega_b_div_dp(a, b_b, da_div_dp, db_b_div_dp)))) * \
-          (1 - 0.2786/ np.cos(theta_sun_prime))
+          (1 - 0.2786/ cos_t_view_p)
 
 
 def k_uB(a,
          b_b,
-         theta_sun_prime,
-         theta_view_prime):
+         cos_t_sun_p,
+         cos_t_view_p):
     """
     # Math: k_{uB} = \frac{a + b_b}{cos \theta_v'} \times (1 + \omega_b)^{2.2658} \times (1 + \frac{0.0577}{cos \theta_{sun}'})
     """
-    return (a + b_b) / np.cos(theta_view_prime) * (1 + omega_b(a, b_b))**2.2658 * (1 + 0.0577 / np.cos(theta_sun_prime))
+    return (a + b_b) / cos_t_sun_p * (1 + omega_b(a, b_b))**2.2658 * (1 + 0.0577 / cos_t_view_p)
 
 def dk_uB_div_dp(a, 
                  
                  b_b, 
                  da_div_dp, 
                  db_b_div_dp, 
-                 theta_sun_prime, 
-                 theta_view_prime):
+                 cos_t_sun_p, 
+                 cos_t_view_p):
     """
     # Math: \frac{\partial}{\partial p}\left[k_{uB}\right] = \frac{\partial}{\partial p}\left[\frac{a + b_b}{cos \theta_v'} \times (1 + \omega_b)^{2.2658} \times (1 + \frac{0.0577}{cos \theta_{sun}'})\right]
     # Math: = \frac{1}{cos \theta_v'}\left[ \frac{\partial}{\partial p}(a + b_b) \times (1 + \omega_b)^{2.2658} + (a + b_b) \times \frac{\partial}{\partial p}((1 + \omega_b)^{2.2658})\right]\times (1 + \frac{0.0577}{cos \theta_{sun}'})
     # Math: = \frac{1}{cos \theta_v'}\left[ (\frac{\partial a}{\partial p} + \frac{\partial b}{\partial p}) \times (1 + \omega_b)^{2.2658} + (a + b) \times (2.2658 \times (1 + \omega_b)^{1.2658} \times \frac{\partial \omega_b}{\partial p}) \right] \times (1 + \frac{0.0577}{cos \theta_{sun}'})
     """
-    return 1/np.cos(theta_view_prime) * \
+    return 1/cos_t_sun_p * \
           (((da_div_dp + db_b_div_dp) * (1 + omega_b**(2.2658)) + \
           (a + b_b) * (2.2658 * (1 + omega_b**(1.2658)) * domega_b_div_dp(a, b_b, da_div_dp, db_b_div_dp)))) * \
-          (1 + 0.0577 / np.cos(theta_sun_prime))
+          (1 + 0.0577 / cos_t_view_p)
 

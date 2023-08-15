@@ -96,6 +96,20 @@ def a_w_T(wavelengths = np.arange(400,800),
     
     return a_w_T
 
+def da_W_div_dT(wavelengths = np.arange(400,800), da_W_div_dT_res=[]):
+
+    if len(da_W_div_dT_res) == 0:
+        da_W_div_dT = resampling.resample_da_W_div_dT(wavelengths=wavelengths)
+    else:
+        da_W_div_dT = da_W_div_dT_res
+    
+    return da_W_div_dT
+
+def a_Y_norm(S, wavelengths, lambda_0=440):
+    """
+    Returns the evaluated expression below which can be memoized for later use.
+    """
+    return np.exp(-S * (wavelengths - lambda_0))
 
 def a_Y(C_Y = 0, 
         wavelengths = np.arange(400,800),
@@ -216,6 +230,11 @@ def da_ph_div_dCi(i,
     return da_ph_div_dCi
 
 
+def a_NAP_norm(S_NAP, wavelengths, lambda_0=440):
+    """
+    Returns the evaluated expression below which can be memoized for later use.
+    """
+    return np.exp(-S_NAP * (wavelengths - lambda_0))
 
 def a_NAP(C_X = 0,
           C_Mie = 0,
@@ -405,8 +424,8 @@ def da_div_dC_X(
       lambda_0 = 440,
       a_NAP_spec_lambda_0 = 0.041,
       S_NAP = 0.011,
-      a_Y_N_res=[]):
-    return da_NAP_div_dC_X(wavelengths=wavelengths, lambda_0=lambda_0, a_NAP_spec_lambda_0=a_NAP_spec_lambda_0, S_NAP=S_NAP, a_Y_N_res=a_Y_N_res)
+      a_NAP_N_res=[]):
+    return da_NAP_div_dC_X(wavelengths=wavelengths, lambda_0=lambda_0, a_NAP_spec_lambda_0=a_NAP_spec_lambda_0, S_NAP=S_NAP, a_NAP_N_res=a_NAP_N_res)
 
 def da_div_dC_Mie(
       C_X = 0, 
