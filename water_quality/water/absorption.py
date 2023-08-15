@@ -55,13 +55,17 @@ def a_w(wavelengths = np.arange(400,800), a_w_res=[]):
     :return: spectral absorption coefficient of pure water [m-1]
     """
     if len(a_w_res)==0:
-        a_w = resampling.resample_a_w(wavelengths=wavelengths)
+        a_w = resampling.resample_a_w(wavelengths=wavelengths) # fetches and resamples water absorption spectrum at reference temp
     else:
-        a_w = a_w_res
+        a_w = a_w_res # return if precomputed. (allows more convenient calling signature by higher-level functions if this spectrum is memoized).
         
     return a_w
 
-def a_w_T(wavelengths = np.arange(400,800), T_W_0=20, T_W=20, a_w_res=[], da_W_div_dT_res=[]):
+def a_w_T(wavelengths = np.arange(400,800), 
+          T_W_0=20, 
+          T_W=20, 
+          a_w_res=[], 
+          da_W_div_dT_res=[]):
     """
     Spectral absorption coefficient of pure water corrected for actual temperature in degrees C after [1].
     
@@ -73,33 +77,25 @@ def a_w_T(wavelengths = np.arange(400,800), T_W_0=20, T_W=20, a_w_res=[], da_W_d
     :param a_w_res: optional, preresampling a_w before inversion saves a lot of time.
     :param da_W_div_dT_res: optional, preresampling da_W_div_dT before inversion saves a lot of time.
     :return: spectral absorption coefficient of pure water corrected for actual temperature
+
+    # Math: a_{w_T} = a_w + (T - T_0) \frac{da_w}{dT}
     """
-    a_w_T = a_w(wavelengths=wavelengths, a_w_res=a_w_res) + (T_W - T_W_0) * temperature_gradient.da_W_div_dT(wavelengths=wavelengths, da_W_div_dT_res=da_W_div_dT_res)
+
+    if len(a_w_res) == 0:
+        y = a_w(wavelengths=wavelengths, a_w_res=a_w_res)
+    else:
+        y = a_w_res
+
+    if len(da_W_div_dT_res) == 0:
+        m = temperature_gradient.da_W_div_dT(wavelengths=wavelengths, da_W_div_dT_res=da_W_div_dT_res)
+    else:
+        m = da_W_div_dT_res
+
+    # Does temperature gradient need to be in a separate module?
+    a_w_T = y + (T_W - T_W_0) * m # using variable names y and m to avoid name collision. y & m from conventional slope/y-intercept equation.
+    
     return a_w_T
 
-
-# def a_Y_norm(wavelengths = np.arange(400,800),
-#              S = 0.014,
-#              lambda_0 = 440):
-#     """
-#     Exponential approximation of normalized spectral absorption of CDOM.
-#     
-#     :wavelengths: wavelengths to compute a_Y for [nm], default: np.arange(400,800)
-#     :param S: spectral slope of CDOM absorption spectrum [m-1], default: 0.014
-#     :param lambda_0: wavelength used for normalization [nm], default: 440
-#     :return: normalized spectral absorption of CDOM
-# 
-#     # Math: norm_{a_y}(S, \lambda, \lambda_0) = e^{-S (\lambda - \lambda_0)}
-#     """
-#     return np.exp(-S * (wavelengths - lambda_0))
-# 
-# def d_a_Y_norm_div_dS(wavelengths = np.arange(400,800),
-#              S = 0.014,
-#              lambda_0 = 440):
-#     """
-#     # Math: \frac{\partial}{\partial S}norm_{a_y} = (\lambda - \lambda_0)e^{-S (\lambda - \lambda_0)}
-#     """
-#     return -(wavelengths - lambda_0) * np.exp(-S * (wavelengths - lambda_0))
 
 def a_Y(C_Y = 0, 
         wavelengths = np.arange(400,800),
@@ -124,7 +120,7 @@ def a_Y(C_Y = 0,
     :param a_Y_N_res: optional, precomputing a_Y_norm before inversion saves a lot of time.   
     :return: spectral absorption coefficient of CDOM or yellow substances
 
-    # Math: a_{CDOM}(\lambda) = C_Y * norm_{a_y} + K
+    # Math: a_{CDOM}(\lambda) = C_Y * e^{-S (\lambda - \lambda_0)} + K
     """
     if len(a_Y_N_res)==0:
         a_Y_N = np.exp(-S * (wavelengths - lambda_0))
@@ -137,11 +133,15 @@ def a_Y(C_Y = 0,
     
 def da_Y_div_dC_Y(wavelengths = np.arange(400,800),
         S = 0.014, 
-        lambda_0 = 440):
+        lambda_0 = 440,
+        a_Y_N_res = []):
     """
-    # Math: \frac{\partial}{\partial C_y}\left[C_Y * norm_{a_y} + K\right] = norm_{a_y}
+    # Math: \frac{\partial}{\partial C_y}\left[C_Y * e^{-S (\lambda - \lambda_0)} + K \right] = e^{-S (\lambda - \lambda_0)}
     """
-    da_Y_div_dC_Y = np.exp(-S * (wavelengths - lambda_0))
+    if len(a_Y_N_res) == 0:
+        da_Y_div_dC_Y = np.exp(-S * (wavelengths - lambda_0))
+    else:
+        da_Y_div_dC_Y = a_Y_N_res
     
     return da_Y_div_dC_Y
 
@@ -149,11 +149,17 @@ def da_Y_div_dS(C_Y = 0,
         wavelengths = np.arange(400,800),
         S = 0.014, 
         lambda_0 = 440,
-        K = 0):
+        a_Y_N_res = []):
     """
-    # Math: \frac{\partial}{\partial S}C_Y * norm_{a_y} = C_Y \frac{\partial}{\partial S} norm_{a_y}
+    # Math: \frac{\partial}{\partial S}C_Y * e^{-S (\lambda - \lambda_0)} = C_Y \frac{\partial}{\partial S} e^{-S (\lambda - \lambda_0)}
+    # Math: = C_Y (\lambda_0 - \lambda) e^{-S (\lambda - \lambda_0)}
     """
-    da_Y_div_dS = C_Y * -(wavelengths - lambda_0) * np.exp(-S * (wavelengths - lambda_0))
+    if len(a_Y_N_res) == 0:
+        a_Y_N = np.exp(-S * (wavelengths - lambda_0))
+    else:
+        a_Y_N = a_Y_N_res
+
+    da_Y_div_dS = C_Y * (lambda_0 - wavelengths) * a_Y_N
     
     return da_Y_div_dS
 
@@ -184,7 +190,7 @@ def a_ph(C_0 = 0,
     C_i = np.array([C_0,C_1,C_2,C_3,C_4,C_5])
     
     if len(a_i_spec_res)==0:
-        a_i_spec = resampling.resample_a_i_spec(wavelengths=wavelengths)
+        a_i_spec = resampling.resample_a_i_spec(wavelengths=wavelengths) # fetch and resample phytoplankton spectra
     else:
         a_i_spec = a_i_spec_res
     
@@ -196,6 +202,8 @@ def da_ph_div_dCi(i,
               wavelengths = np.arange(400,800),
               a_i_spec_res = []):
     """
+    Partial derivative of a_phy with respect to jth phytoplankton concentration
+
     # Math: \frac{\partial}{\partial C_j} a_{phy}(\lambda) = \frac{\partial}{\partial C_j} \sum_{i=0}^5 C_i * a_i^* (\lambda) = a_j^*(\lambda)
     """
     if len(a_i_spec_res)==0:
@@ -207,31 +215,6 @@ def da_ph_div_dCi(i,
     
     return da_ph_div_dCi
 
-
-# def a_NAP_norm(wavelengths = np.arange(400,800),
-#                S_NAP = 0.011,
-#                lambda_0 = 440):
-#     """
-#     Normalized absorption spectrum of non-algal particles (NAP).
-#     Can be approximated reasonably well in many cases with an exponential function.
-#     Normalized at the same wavelength (lambda_0) as CDOM.
-#     
-#     :param wavelengths: wavelengths to compute a_NAP_norm for [nm], default: np.arange(400,800)
-#     :param S_NAP: spectral slope of NAP absorption spectrum [m-1], default: 0.011
-#     :param lambda_0: reference wavelength for normalization of NAP absorption spectrum (identical for CDOM) [nm], default: 440 nm
-#     :return: normalized spectral absorption of NAP
-# 
-#     # Math: norm_{a_{NAP}}(\lambda, S, \lambda_0) = e^{-S_{NAP} (\lambda - \lambda_0)}
-#     """
-#     return np.exp(-S_NAP * (wavelengths - lambda_0))
-# 
-# def da_NAP_norm_div_dS_NAP(wavelengths = np.arange(400,800),
-#                S_NAP = 0.011,
-#                lambda_0 = 440):
-#     """
-#     # Math: \frac{\partial}{\partial S} norm_{a_{nap}} = \frac{\partial}{\partial S} e^{-S_{NAP} (\lambda - \lambda_0)} = (\lambda - \lambda_0)e^{-S_{NAP} (\lambda - \lambda_0)}
-#     """
-#     return -(wavelengths - lambda_0) * np.exp(-S_NAP * (wavelengths - lambda_0))
 
 
 def a_NAP(C_X = 0,
@@ -254,8 +237,10 @@ def a_NAP(C_X = 0,
     :param a_NAP_norm_res: optional, preresampling a_NAP_norm before inversion saves a lot of time.
     :return: spectral absorption coefficient of non-algal particles (NAP)
 
-    # Math: a_{NAP} = C_{NAP} * a_{NAP}^*(\lambda_0) * norm_{a_{NAP}}(\lambda) = (C_{X} + C_{Mie}) * a_{NAP}^*(\lambda_0) * norm_{a_{NAP}}(\lambda)
+    # Math: a_{NAP} = C_{NAP} * a_{NAP}^*(\lambda_0) * e^{ -S_{NAP} (\lambda - \lambda_0) }
+    # Math: = (C_X + C_{Mie}) * a_{NAP}^*(\lambda_0) * e^{ -S_{NAP} (\lambda - \lambda_0) }
     """
+
     C_NAP = C_X + C_Mie
     
     if len(a_NAP_N_res)==0:
@@ -271,11 +256,17 @@ def da_NAP_div_dC_X(
           wavelengths = np.arange(400,800), 
           lambda_0 = 440,
           a_NAP_spec_lambda_0 = 0.041,
-          S_NAP = 0.011):
+          S_NAP = 0.011,
+          a_NAP_N_res=[]):
     """
-    # Math: \frac{\partial}{\partial C_{NAP}}a_{NAP} = a_{NAP}^*(\lambda_0) * norm_{a_{NAP}}(\lambda) 
+    # Math: \frac{\partial}{\partial C_{X}}a_{NAP} = a_{NAP}^*(\lambda_0) * e^{-S(\lambda - \lambda_0)}
     """
-    da_NAP_div_dC_X = a_NAP_spec_lambda_0 * np.exp(-S_NAP * (wavelengths - lambda_0))
+    if len(a_NAP_N_res) == 0:
+        a_NAP_N = np.exp(-S_NAP * (wavelengths - lambda_0))
+    else:
+        a_NAP_N = a_NAP_N_res
+
+    da_NAP_div_dC_X = a_NAP_spec_lambda_0 * a_NAP_N
     
     return da_NAP_div_dC_X
 
@@ -283,11 +274,17 @@ def da_NAP_div_dC_Mie(
           wavelengths = np.arange(400,800), 
           lambda_0 = 440,
           a_NAP_spec_lambda_0 = 0.041,
-          S_NAP = 0.011):
+          S_NAP = 0.011,
+          a_NAP_N_res=[]):
     """
     # Math: \frac{\partial}{\partial C_{Mie}}a_{NAP} = a_{NAP}^*(\lambda_0) * norm_{a_{NAP}}(\lambda) 
     """    
-    da_NAP_div_dC_Mie = a_NAP_spec_lambda_0 * np.exp(-S_NAP * (wavelengths - lambda_0))
+    if len(a_NAP_N_res) == 0:
+        a_NAP_N = np.exp(-S_NAP * (wavelengths - lambda_0))
+    else:
+        a_NAP_N = a_NAP_N_res
+
+    da_NAP_div_dC_Mie = a_NAP_spec_lambda_0 * a_NAP_N
     
     return da_NAP_div_dC_Mie
 
@@ -296,13 +293,20 @@ def da_NAP_div_dS_NAP(C_X = 0,
           wavelengths = np.arange(400,800), 
           lambda_0 = 440,
           a_NAP_spec_lambda_0 = 0.041,
-          S_NAP = 0.011):
+          S_NAP = 0.011,
+          a_NAP_N_res=[]):
     """
-    # Math: \frac{\partial}{\partial S_{NAP}}a_{NAP} = C_{NAP} * a_{NAP}^*(\lambda_0) * \frac{\partial}{\partial S_{NAP}}norm_{a_{NAP}}(\lambda) 
+    # Math: \frac{\partial}{\partial S_{NAP}}a_{NAP} = C_{NAP} * a_{NAP}^*(\lambda_0) * \frac{\partial}{\partial S_{NAP}}e^{-S(\lambda - \lambda_0)}
+    # Math: = C_{NAP} * a_{NAP}^*(\lambda_0) * (\lambda_0 - \lambda) * e^{-S(\lambda - \lambda_0)}
     """
     C_NAP = C_X + C_Mie
     
-    da_NAP_div_dS_NAP = C_NAP * a_NAP_spec_lambda_0 * -(wavelengths - lambda_0) * np.exp(-S_NAP * (wavelengths - lambda_0))
+    if len(a_NAP_N_res) == 0:
+        a_NAP_n = np.exp(-S_NAP * (wavelengths - lambda_0))
+    else:
+        a_NAP_N = a_NAP_N_res
+
+    da_NAP_div_dS_NAP = C_NAP * a_NAP_spec_lambda_0 * -(wavelengths - lambda_0) * a_NAP_n
     
     return da_NAP_div_dS_NAP
 
@@ -366,8 +370,7 @@ def a(C_0 = 0,
            a_Y(C_Y=C_Y, wavelengths=wavelengths, S=S, lambda_0=lambda_0, K=K, a_Y_N_res=a_Y_N_res) + \
            a_NAP(C_X=C_X, C_Mie=C_Mie, wavelengths=wavelengths, a_NAP_spec_lambda_0=a_NAP_spec_lambda_0, S_NAP=S_NAP, lambda_0=lambda_0, a_NAP_N_res=a_NAP_N_res)
 
-    a    = a_w(wavelengths=wavelengths, a_w_res=a_w_res) + \
-           (T_W - T_W_0) * temperature_gradient.da_W_div_dT(wavelengths=wavelengths, da_W_div_dT_res=da_W_div_dT_res) + \
+    a    = a_w_T(wavelengths=wavelengths, a_w_res=a_w_res, T_W=T_W, T_W_0=T_W_0, da_W_div_dT_res=da_W_div_dT_res) + \
            a_wc
     
     return a
@@ -385,24 +388,25 @@ def da_div_dC_i(i,
 
 def da_div_dC_Y(wavelengths = np.arange(400,800),
       S = 0.014,
-      lambda_0 = 440):
+      lambda_0 = 440,
+      a_Y_N_res=[]):
     
-    return da_Y_div_dC_Y(wavelengths=wavelengths, S=S, lambda_0=lambda_0)
+    return da_Y_div_dC_Y(wavelengths=wavelengths, S=S, lambda_0=lambda_0, a_Y_N_res=a_Y_N_res)
 
 def da_div_dS(C_Y = 0, 
       wavelengths = np.arange(400,800),
       S = 0.014,
       lambda_0 = 440,
-      ):
-    return da_Y_div_dS(C_Y=C_Y, wavelengths=wavelengths, S=S, lambda_0=lambda_0)
+      a_Y_N_res=[]):
+    return da_Y_div_dS(C_Y=C_Y, wavelengths=wavelengths, S=S, lambda_0=lambda_0, a_Y_N_res=a_Y_N_res)
 
 def da_div_dC_X(
       wavelengths = np.arange(400,800),
       lambda_0 = 440,
       a_NAP_spec_lambda_0 = 0.041,
       S_NAP = 0.011,
-      ):
-    return da_NAP_div_dC_X(wavelengths=wavelengths, lambda_0=lambda_0, a_NAP_spec_lambda_0=a_NAP_spec_lambda_0, S_NAP=S_NAP)
+      a_Y_N_res=[]):
+    return da_NAP_div_dC_X(wavelengths=wavelengths, lambda_0=lambda_0, a_NAP_spec_lambda_0=a_NAP_spec_lambda_0, S_NAP=S_NAP, a_Y_N_res=a_Y_N_res)
 
 def da_div_dC_Mie(
       C_X = 0, 

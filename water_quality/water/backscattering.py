@@ -43,8 +43,8 @@ from .. helper import resampling
 
 
 def morel(wavelengths: np.array = np.arange(400,800), 
-          fresh: bool = True, 
-          lambda_1 = 500):
+        fresh: bool = True, 
+        lambda_1 = 500):
     """
     Spectral backscattering coefficient of pure water according to Morel (1974) [1].
     
@@ -63,8 +63,8 @@ def morel(wavelengths: np.array = np.arange(400,800),
 
 
 def b_bw(wavelengths: np.array = np.arange(400,800), 
-         fresh: bool = True,
-         b_bw_res: np.array = []):
+        fresh: bool = True,
+        b_bw_res: np.array = []):
     """
     Spectral backscattering coefficient of pure water according to Morel (1974) [1].
     
@@ -84,9 +84,9 @@ def b_bw(wavelengths: np.array = np.arange(400,800),
 
 
 def b_bphy(C_phy: float = 0, 
-           wavelengths: np.array = np.arange(400,800), 
-           b_bphy_spec: float = 0.0010,           
-           b_phy_norm_res: np.array = []):
+        wavelengths: np.array = np.arange(400,800), 
+        b_bphy_spec: float = 0.0010,           
+        b_phy_norm_res: np.array = []):
     """
     Backscattering of phytoplankton resampled to specified wavelengths.
     The normalized phytoplankton scattering coefficient b_phy_norm is imported from file.
@@ -99,10 +99,10 @@ def b_bphy(C_phy: float = 0,
     :param b_phy_norm_res: optional, preresampling b_phy_norm before inversion saves a lot of time.
     :return:
 
-    # Math: b_{b,phy} = C_{phy} * b_{b, phy}^* * b_{b, phy}^*(\lambda)
+    # Math: b_{b,phy} = C_{phy} * b_{b, phy}^* * b_{b, phy}^N(\lambda)
     """       
     if len(b_phy_norm_res)==0:
-        b_phy_norm = resampling.resample_b_phy_norm(wavelengths=wavelengths)
+        b_phy_norm = resampling.resample_b_phy_norm(wavelengths=wavelengths) # fetches spectrum and resamples
     else:
         b_phy_norm = b_phy_norm_res
 
@@ -111,8 +111,8 @@ def b_bphy(C_phy: float = 0,
     return b_bphy
 
 def db_bphy_div_dC_phy(wavelengths: np.array = np.arange(400,800), 
-           b_bphy_spec: float = 0.0010,           
-           b_phy_norm_res: np.array = []):
+        b_bphy_spec: float = 0.0010,           
+        b_phy_norm_res: np.array = []):
     """
     # Math: \frac{\partial}{\partial C_{phy}}b_{b,phy} = \frac{\partial}{\partial C_{phy}}\left[C_{phy} * b_{b, phy}^* * b_{b, phy}^N(\lambda)\right] = b_{b, phy}^* * b_{b, phy}^N(\lambda)
     """
@@ -127,10 +127,10 @@ def db_bphy_div_dC_phy(wavelengths: np.array = np.arange(400,800),
 
 
 def b_bX(C_X: float = 0,
-         wavelengths: np.array = np.arange(400,800),
-         b_bX_spec: float = 0.0086,
-         b_bX_norm_factor: float = 1,
-         b_X_norm_res = []):
+        wavelengths: np.array = np.arange(400,800),
+        b_bX_spec: float = 0.0086,
+        b_bX_norm_factor: float = 1,
+        b_X_norm_res = []):
     """
     Spectral backscattering coefficient of particles of type I defined by a normalized scattering coefficient with arbitrary wavelength dependency [1].
     The default parameter setting is representative for Lake Constance [1, 2].
@@ -157,9 +157,9 @@ def b_bX(C_X: float = 0,
     return b_bX
 
 def db_bX_div_dC_X(wavelengths: np.array = np.arange(400,800),
-         b_bX_spec: float = 0.0086,
-         b_bX_norm_factor: float = 1,
-         b_X_norm_res = []):
+        b_bX_spec: float = 0.0086,
+        b_bX_norm_factor: float = 1,
+        b_X_norm_res = []):
     """
     # Math: \frac{\partial}{\partial C_X} b_{b,x} = \frac{\partial}{\partial C_X}\left[C_X * b_{b,X}^* * b_{b,X}^N(\lambda)\right] = b_{b,X}^* * b_{b,X}^N(\lambda)
     """
@@ -174,11 +174,11 @@ def db_bX_div_dC_X(wavelengths: np.array = np.arange(400,800),
 
 
 def b_bMie(C_Mie: float = 0,
-           wavelengths: np.array = np.arange(400,800),
-           b_bMie_spec: float = 0.0042,
-           lambda_S: float = 500, 
-           n: float = -1,
-           b_Mie_norm_res=[]):
+        wavelengths: np.array = np.arange(400,800),
+        b_bMie_spec: float = 0.0042,
+        lambda_S: float = 500, 
+        n: float = -1,
+        b_Mie_norm_res=[]):
     """
     Spectral backscattering coefficient of particles of type II "defined by the normalized scattering coefficient (wavelengths/lambda_S)**n, 
     where the Angström exponent n is related to the particle size distribution" [1]. The default parameter setting is representative for Lake Constance [1, 2].
@@ -197,7 +197,7 @@ def b_bMie(C_Mie: float = 0,
     # Math: b_{b,Mie} = C_{Mie} * b_{b,Mie} * (\frac{\lambda}{\lambda_S})^n
     """
     if len(b_Mie_norm_res)==0:
-        b_bMie_norm = ((wavelengths/lambda_S)**n)
+        b_bMie_norm = (wavelengths/lambda_S)**n
     else:
         b_bMie_norm = b_Mie_norm_res
     
@@ -205,15 +205,15 @@ def b_bMie(C_Mie: float = 0,
 
     return b_bMie
 
-def db_Mie_div_dC_Mie(wavelengths: np.array = np.arange(400,800),
-           b_bMie_spec: float = 0.0042,
-           lambda_S: float = 500, 
-           n: float = -1,
-           b_Mie_norm_res=[]):
+def db_bMie_div_dC_Mie(wavelengths: np.array = np.arange(400,800),
+        b_bMie_spec: float = 0.0042,
+        lambda_S: float = 500, 
+        n: float = -1,
+        b_bMie_norm_res=[]):
     """
     # Math: \frac{\partial}{\partial C_{Mie}}b_{b,Mie} = \frac{\partial}{\partial C_{Mie}}\left[C_{Mie} * b_{b,Mie} * (\frac{\lambda}{\lambda_S})^n \right] = b_{b,Mie} * (\frac{\lambda}{\lambda_S})^n
     """
-    if len(b_Mie_norm_res) == 0:
+    if len(b_bMie_norm_res) == 0:
         b_bMie_norm = (wavelengths/lambda_S)**n
     else:
         b_bMie_norm = b_bMie_norm_res
@@ -223,27 +223,34 @@ def db_Mie_div_dC_Mie(wavelengths: np.array = np.arange(400,800),
     return db_bMie_div_dC_Mie
 
 def db_Mie_div_dn(C_Mie: float = 0,
-           wavelengths: np.array = np.arange(400,800),
-           b_bMie_spec: float = 0.0042,
-           lambda_S: float = 500, 
-           n: float = -1):
+        wavelengths: np.array = np.arange(400,800),
+        b_bMie_spec: float = 0.0042,
+        lambda_S: float = 500, 
+        n: float = -1,
+        b_bMie_norm_res=[]):
     """
     # Math: \frac{\partial}{\partial n} \left[C_{Mie} * b_{b,Mie} * (\frac{\lambda}{\lambda_S})^n \right] = C_{Mie} * b_{b,Mie} * ln(\frac{\lambda}{\lambda_S}) (\frac{\lambda}{\lambda_S})^n
     """
-    b_bMie_div_dn = C_Mie * b_bMie_spec * np.log(wavelengths/lambda_S) * ((wavelengths/lambda_S)**n)
+    if len(b_bMie_norm_res) == 0:
+        b_bMie_norm = (wavelengths/lambda_S)**n
+    else:
+        b_bMie_norm = b_bMie_norm_res
+
+    b_bMie_div_dn = C_Mie * b_bMie_spec * np.log(wavelengths/lambda_S) * b_bMie_norm
+
     return b_bMie_div_dn
 
 
 def b_bNAP(C_X: float = 0,
-           C_Mie: float = 0,
-           wavelengths: np.array = np.arange(400,800),
-           b_bMie_spec: float = 0.0042,
-           lambda_S: float = 500, 
-           n: float = -1,
-           b_bX_spec: float = 0.0086,
-           b_bX_norm_factor: float = 1,
-           b_X_norm_res: np.array = [],
-           b_Mie_norm_res: np.array = []):
+        C_Mie: float = 0,
+        wavelengths: np.array = np.arange(400,800),
+        b_bMie_spec: float = 0.0042,
+        lambda_S: float = 500, 
+        n: float = -1,
+        b_bX_spec: float = 0.0086,
+        b_bX_norm_factor: float = 1,
+        b_X_norm_res: np.array = [],
+        b_Mie_norm_res: np.array = []):
     """
     Spectral backscattering coefficient of non-algal particles (NAP) as a mixture of two types with spectrally different backscattering coefficients [1].
     
@@ -270,9 +277,9 @@ def b_bNAP(C_X: float = 0,
     return b_bNAP
 
 def db_bNAP_div_dC_X(wavelengths: np.array = np.arange(400,800),
-           b_bX_spec: float = 0.0086,
-           b_bX_norm_factor: float = 1,
-           b_X_norm_res: np.array = []):
+        b_bX_spec: float = 0.0086,
+        b_bX_norm_factor: float = 1,
+        b_X_norm_res: np.array = []):
     """
     # Math: b_{b,NAP} = b_{b,X} + b_{b,Mie}
     # Math: \frac{\partial}{\partial C_X}b_{b,NAP} = \frac{\partial}{\partial C_X}b_{b,X}
@@ -280,25 +287,27 @@ def db_bNAP_div_dC_X(wavelengths: np.array = np.arange(400,800),
     return db_bX_div_dC_X(wavelengths=wavelengths, b_bX_spec=b_bX_spec, b_bX_norm_factor=b_bX_norm_factor, b_X_norm_res=b_X_norm_res)
 
 def db_bNAP_div_dC_Mie(wavelengths: np.array = np.arange(400,800),
-           b_bMie_spec: float = 0.0042,
-           lambda_S: float = 500, 
-           n=-1):
+        b_bMie_spec: float = 0.0042,
+        lambda_S: float = 500, 
+        n=-1,
+        b_bMie_norm_res=[]):
     """
     # Math: b_{b,NAP} = b_{b,X} + b_{b,Mie}
     # Math: \frac{\partial}{\partial C_{Mie}}b_{b,NAP} = \frac{\partial}{\partial C_{Mie}}b_{b,Mie}
     """
-    return db_Mie_div_dC_Mie(wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n)
+    return db_bMie_div_dC_Mie(wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n, b_bMie_norm_res=b_bMie_norm_res)
 
 def db_NAP_div_dn(C_Mie: float = 0,
-           wavelengths: np.array = np.arange(400,800),
-           b_bMie_spec: float = 0.0042,
-           lambda_S: float = 500, 
-           n: float = -1):
+        wavelengths: np.array = np.arange(400,800),
+        b_bMie_spec: float = 0.0042,
+        lambda_S: float = 500, 
+        n: float = -1,
+        b_bMie_norm_res=[]):
     """
     # Math: b_{b,NAP} = b_{b,X} + b_{b,Mie}
     # Math: \frac{\partial}{\partial n}b_{b,NAP} = \frac{\partial}{\partial n}b_{b,Mie}
     """
-    return db_Mie_div_dn(C_Mie=C_Mie, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n)
+    return db_Mie_div_dn(C_Mie=C_Mie, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n, b_bMie_norm_res=b_bMie_norm_res)
 
 
 def b_b(C_X: float = 0,
@@ -315,8 +324,7 @@ def b_b(C_X: float = 0,
         b_bw_res: np.array = [],
         b_phy_norm_res: np.array = [],
         b_X_norm_res=[],
-        b_Mie_norm_res=[]
-        ):
+        b_Mie_norm_res=[]):
     """
     Spectral backscattering coefficient of a natural water body as the sum of the backscattering coefficients of pure water, phytoplankton and non-algal particles [1].
     
@@ -364,11 +372,11 @@ def db_b_div_dC_Mie(wavelengths: np.array = np.arange(400,800),
         n=-1,
         b_bMie_spec: float = 0.0042,
         lambda_S: float = 500, 
-        ):
+        b_bMie_norm_res=[]):
     """
     # Math: \frac{\partial}{\partial C_{Mie}} b_b(\lambda) = \frac{\partial}{\partial C_{Mie}} \left[ b_{b,w}(\lambda) + b_{b, phy}(\lambda) + b_{b, NAP}(\lambda) \right] = \frac{\partial}{\partial C_{Mie}}b_{b,NAP}(\lambda)
     """  
-    db_b_div_dC_Mie = db_bNAP_div_dC_Mie(wavelengths=wavelengths, n=n, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S)
+    db_b_div_dC_Mie = db_bNAP_div_dC_Mie(wavelengths=wavelengths, n=n, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, b_bMie_norm_res=b_bMie_norm_res)
 
     return db_b_div_dC_Mie
 
@@ -377,11 +385,11 @@ def db_b_div_dn(C_Mie: float = 0,
     b_bMie_spec: float = 0.0042,
     lambda_S: float = 500, 
     n: float = -1,
-    ):
+    b_bMie_norm_res=[]):
     """
     # Math: \frac{\partial}{\partial n} b_b(\lambda) = \frac{\partial}{\partial n} \left[ b_{b,w}(\lambda) + b_{b, phy}(\lambda) + b_{b, NAP}(\lambda) \right] = \frac{\partial}{\partial n}b_{b,NAP}(\lambda)
     """  
-    db_b_div_dn = db_NAP_div_dn(C_Mie=C_Mie, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n)
+    db_b_div_dn = db_NAP_div_dn(C_Mie=C_Mie, wavelengths=wavelengths, b_bMie_spec=b_bMie_spec, lambda_S=lambda_S, n=n, b_bMie_norm_res=b_bMie_norm_res)
     
     return db_b_div_dn
 

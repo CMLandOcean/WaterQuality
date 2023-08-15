@@ -107,12 +107,12 @@ def dR_rs_b_div_df_i(i,
     """
     # Math: \frac{\partial}{\partial f_i} R_{rs}^b(\lambda) = \frac{\partial}{\partial f_i} \sum_{n=0}^{N-1}f_n * B_n * a_n(\lambda) = B_i * a_i(\lambda)
     """
-    f_i = np.array([f_0,f_1,f_2,f_3,f_4,f_5])
     B_i = np.array([B_0,B_1,B_2,B_3,B_4,B_5])
     
     if len(R_i_b_res)==0:
         R_i_b = resampling.resample_R_i_b(wavelengths=wavelengths)
-    else: R_i_b = R_i_b_res
+    else: 
+        R_i_b = R_i_b_res
     
     dR_rs_b_div_df_i = B_i[i] * R_i_b.T[i]
     

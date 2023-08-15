@@ -43,6 +43,36 @@ from .. water import absorption, backscattering, temperature_gradient, attenuati
 from .. surface import surface, air_water
 from .. helper import resampling
 
+def f_rs(omega_b,
+        theta_sun_prime = np.radians(30),
+        theta_view_prime = np.radians(0)):
+    """
+    # Math: f_{rs} = 0.0512 \times (1 + 4.6659 \times \omega_b - 7.8387 \times \omega_b^2 + 5.4571 \times \omega_b^3) \times (1 + \frac{0.1098}{cos \theta_{sun}'}) \times (1 + \frac{0.4021}{cos \theta_{sun}'})
+    
+    Applying Horner's method:
+    # Math: f_{rs} = 0.0512 \times (1 + \omega_b \times (4.6659 + \omega_b \times(-7.8387 + \omega_b \times (5.4571))) \times (1 + \frac{0.1098}{cos \theta_{sun}'}) \times (1 + \frac{0.4021}{cos \theta_{sun}'})
+    """
+    
+    return 0.0512 * (1 + omega_b * (4.6659 + omega_b * (-7.8387 + omega_b * (5.4571)))) * (1 + 0.1098 / np.cos(theta_sun_prime) * (1 + 0.4021 / np.cos(theta_view_prime)))
+
+def df_rs_div_dp(omega_b,
+                  domega_b_div_dp):
+    """
+    Generalized partial derivative for f_rs with respect to Fit Param (p)
+    The only independent variable of the polynomial f_rs is omega_b
+    and the derivative will have the same underlying for for all lower
+    level variables.
+
+    # Math: f_{rs} = 0.0512 \times (1 + \omega_b \times (4.6659 + \omega_b \times(-7.8387 + \omega_b \times (5.4571))) \times (1 + \frac{0.1098}{cos \theta_{sun}'}) \times (1 + \frac{0.4021}{cos \theta_{sun}'})
+    # Math: \frac{\partial}{\partial p}\left[f_{rs}\right] = 0.0512 \times \frac{\partial \omega_b}{\partial p} \times (4.6659 + \omega_b \times (2 \times  (-7.8387) + \omega_b \times (3 \times 5.4571))
+    # Math: \frac{\partial}{\partial p}\left[f_{rs}\right] = 0.0512 \times \frac{\partial \omega_b}{\partial p} \times (4.6659 + \omega_b \times (-15.6774 + \omega_b \times (16.3713))
+    """
+    return 0.0512 * domega_b_div_dp * (4.6659 + omega_b * (-15.6774 + omega_b * (16.3713)))
+
+def r_rs_deep(f_rs, omega_b):
+    return f_rs * omega_b
+
+
 
 def r_rs_dp(u, 
             theta_sun=np.radians(30), 
