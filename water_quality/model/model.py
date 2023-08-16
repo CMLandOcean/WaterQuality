@@ -292,9 +292,9 @@ def fwd(p,
         n2=1.33,
         A_rs1 = 1.1567,
         A_rs2 = 1.0389,
-        weights=[],
-        a_i_spec_res=[],
         a_w_res=[],
+        da_W_div_dT_res=[],
+        a_i_spec_res=[],
         a_Y_N_res = [],
         a_NAP_N_res = [],
         b_phy_norm_res = [],
@@ -302,7 +302,6 @@ def fwd(p,
         b_X_norm_res=[],
         b_Mie_norm_res=[],
         R_i_b_res = [],
-        da_W_div_dT_res=[],
         E_0_res=[],
         a_oz_res=[],
         a_ox_res=[],
@@ -314,22 +313,29 @@ def fwd(p,
     """
     Forward simulation of a shallow water remote sensing reflectance spectrum based on the provided parameterization.
     """
-    ctsp = np.cos(air_water.snell(theta_sun, n1=n1, n2=n2))
+    ctsp = np.cos(air_water.snell(theta_sun, n1=n1, n2=n2))  #cos of theta_sun_prime. theta_sun_prime = snell(theta_sun, n1, n2)
     ctvp = np.cos(air_water.snell(theta_view, n1=n1, n2=n2))
 
     a_sim = absorption.a(C_0=p[0], C_1=p[1], C_2=p[2], C_3=p[3], C_4=p[4], C_5=p[5], 
-                        C_Y=p[6], C_X=p[7], C_Mie=p[8], wavelengths=wavelengths, S=p[9], 
-                        S_NAP=p[10], a_w_res=a_w_res,
-                        da_W_div_dT_res=da_W_div_dT_res, a_i_spec_res=a_i_spec_res, a_Y_N_res=a_Y_N_res,
+                        C_Y=p[6], C_X=p[7], C_Mie=p[8], S=p[9], 
+                        S_NAP=p[10], wavelengths=wavelengths, 
+                        a_w_res=a_w_res,
+                        da_W_div_dT_res=da_W_div_dT_res, 
+                        a_i_spec_res=a_i_spec_res, 
+                        a_Y_N_res=a_Y_N_res,
                         a_NAP_N_res=a_NAP_N_res)
     
-    b_b_sim = backscattering.b_b(C_X=p[7], C_Mie=p[8], C_phy=np.sum(p[0:6]), wavelengths=wavelengths, 
-                        fresh=True, b_bw_res=b_bw_res, b_phy_norm_res=b_phy_norm_res, 
-                        b_X_norm_res=b_X_norm_res, b_Mie_norm_res=b_Mie_norm_res)
+    b_b_sim = backscattering.b_b(C_X=p[7], C_Mie=p[8], C_phy=np.sum(p[:6]), wavelengths=wavelengths, fresh=True, 
+                        b_bw_res=b_bw_res, 
+                        b_phy_norm_res=b_phy_norm_res, 
+                        b_X_norm_res=b_X_norm_res, 
+                        b_Mie_norm_res=b_Mie_norm_res)
 
-    ob = attenuation.omega_b(a_sim, b_b_sim)
+    Rrsb = bottom_reflectance.R_rs_b(p[11], p[12], p[13], p[14], p[15], p[16], R_i_b_res=R_i_b_res)
 
-    frs=f_rs(omega_b=ob, cos_t_sun_p=ctsp, cos_t_view_p=ctvp)
+    ob = attenuation.omega_b(a_sim, b_b_sim) #ob is omega_b. Shortened to distinguish between new var and function params.
+
+    frs = f_rs(omega_b=ob, cos_t_sun_p=ctsp, cos_t_view_p=ctvp)
 
     rrsd = r_rs_deep(f_rs=frs, omega_b=ob)
 
@@ -339,14 +345,13 @@ def fwd(p,
 
     kuB = attenuation.k_uB(a=a_sim, b_b=b_b_sim, cos_t_sun_p=ctsp, cos_t_view_p=ctvp)
 
-    Rrsb = bottom_reflectance.R_rs_b(p[0], p[1], p[2], p[3], p[4], p[5])
-
     Ars1 = A_rs1
 
     Ars2 = A_rs2
 
     R_rs_sim = air_water.below2above(r_rs_shallow(r_rs_deep=rrsd, K_d=Kd, k_uW=kuW, zB=depth, R_rs_b=Rrsb, k_uB=kuB, A_rs1=Ars1, A_rs2=Ars2))
 
+    return R_rs_sim
 '''    
     if params['fit_surface']==True:
         R_rs_sim += surface.R_rs_surf(wavelengths = wavelengths, 
@@ -374,9 +379,9 @@ def fwd(p,
                                       E_d_res=E_d_res)
     else:
         R_rs_sim += params['offset']
-
-    return R_rs_sim
 ''' 
+
+    
 
 def wrap(outerfunc, *outer_args, **outer_kwargs):
       def inner_func(*inner_args, **inner_kwargs):
