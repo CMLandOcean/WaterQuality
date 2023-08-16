@@ -39,8 +39,7 @@
 
 import numpy as np
 import pandas as pd
-from .. helper import resampling 
-from . import temperature_gradient
+from .. helper import resampling
 
 
 def a_w(wavelengths = np.arange(400,800), a_w_res=[]):
@@ -87,11 +86,10 @@ def a_w_T(wavelengths = np.arange(400,800),
         y = a_w_res
 
     if len(da_W_div_dT_res) == 0:
-        m = temperature_gradient.da_W_div_dT(wavelengths=wavelengths, da_W_div_dT_res=da_W_div_dT_res)
+        m = da_W_div_dT(wavelengths=wavelengths, da_W_div_dT_res=da_W_div_dT_res)
     else:
         m = da_W_div_dT_res
 
-    # Does temperature gradient need to be in a separate module?
     a_w_T = y + (T_W - T_W_0) * m # using variable names y and m to avoid name collision. y & m from conventional slope/y-intercept equation.
     
     return a_w_T
