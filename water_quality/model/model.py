@@ -51,7 +51,7 @@ def f_rs(omega_b,
     Applying Horner's method:
     # Math: f_{rs} = 0.0512 \times (1 + \omega_b \times (4.6659 + \omega_b \times(-7.8387 + \omega_b \times (5.4571))) \times (1 + \frac{0.1098}{cos \theta_{sun}'}) \times (1 + \frac{0.4021}{cos \theta_{sun}'})
     """
-    
+
     return 0.0512 * (1 + omega_b * (4.6659 + omega_b * (-7.8387 + omega_b * (5.4571)))) * (1 + 0.1098 / cos_t_sun_p) * (1 + 0.4021 / cos_t_view_p)
     
 def df_rs_div_dp(omega_b,
@@ -112,7 +112,7 @@ def r_rs_shallow(r_rs_deep,
     # Math: r_{rs}^{sh-} = r_{rs}^{deep-} * \left[ 1 - A_{rs,1} * e^{-(K_d + k_{uW}) * zB} \right] + A_{rs,2} * R_{rs}^b * e^{-(K_d + k_{uB}) * zB}
     """
     return r_rs_deep * \
-            (1 - A_rs1 * np.exp*(-(K_d + k_uW) * zB)) + \
+            (1 - A_rs1 * np.exp(-(K_d + k_uW) * zB)) + \
             A_rs2 * R_rs_b * np.exp(-(K_d + k_uB) * zB)
 
 def drs_rs_shallow_div_dp(r_rs_deep,
@@ -281,17 +281,30 @@ def invert(params,
     
     return res
 
-
+# p expected as list:
+# C_0...C_5, C_Y, C_X, C_Mie, S, S_NAP, f_0...f_5
 def fwd(p,
         wavelengths,
         theta_sun,
         theta_view,
         depth,
+        n=-1,
+        K=0,
         kappa_0=1.0546,
         n1=1,
         n2=1.33,
-        A_rs1 = 1.1567,
-        A_rs2 = 1.0389,
+        A_rs1=1.1576,
+        A_rs2=1.0389,
+        a_NAP_spec_lambda_0=0.041,
+        b_bphy_spec=.001,
+        b_bMie_spec=0.0042,
+        b_bx_spec=0.0086,
+        b_bx_norm_factor=1,
+        lambda_0=440,
+        lambda_S=500,
+        T_W=20,
+        T_W_0=20,
+        fresh=True,
         a_w_res=[],
         da_W_div_dT_res=[],
         a_i_spec_res=[],
@@ -318,20 +331,33 @@ def fwd(p,
 
     a_sim = absorption.a(C_0=p[0], C_1=p[1], C_2=p[2], C_3=p[3], C_4=p[4], C_5=p[5], 
                         C_Y=p[6], C_X=p[7], C_Mie=p[8], S=p[9], 
-                        S_NAP=p[10], wavelengths=wavelengths, 
+                        S_NAP=p[10], 
+                        a_NAP_spec_lambda_0=a_NAP_spec_lambda_0,
+                        lambda_0=lambda_0,
+                        K=K,
+                        wavelengths=wavelengths,
+                        T_W=T_W,
+                        T_W_0=T_W_0,
                         a_w_res=a_w_res,
                         da_W_div_dT_res=da_W_div_dT_res, 
                         a_i_spec_res=a_i_spec_res, 
                         a_Y_N_res=a_Y_N_res,
                         a_NAP_N_res=a_NAP_N_res)
     
-    b_b_sim = backscattering.b_b(C_X=p[7], C_Mie=p[8], C_phy=np.sum(p[:6]), wavelengths=wavelengths, fresh=True, 
+    b_b_sim = backscattering.b_b(C_X=p[7], C_Mie=p[8], C_phy=np.sum(p[:6]), wavelengths=wavelengths, 
+                        fresh=fresh,
+                        b_bphy_spec=b_bphy_spec,
+                        b_bMie_spec=b_bMie_spec,
+                        b_bX_spec=b_bx_spec,
+                        b_bX_norm_factor=b_bx_norm_factor,
+                        lambda_S=lambda_S,
+                        n=n,
                         b_bw_res=b_bw_res, 
                         b_phy_norm_res=b_phy_norm_res, 
                         b_X_norm_res=b_X_norm_res, 
                         b_Mie_norm_res=b_Mie_norm_res)
 
-    Rrsb = bottom_reflectance.R_rs_b(p[11], p[12], p[13], p[14], p[15], p[16], R_i_b_res=R_i_b_res)
+    Rrsb = bottom_reflectance.R_rs_b(p[11], p[12], p[13], p[14], p[15], p[16], wavelengths=wavelengths, R_i_b_res=R_i_b_res)
 
     ob = attenuation.omega_b(a_sim, b_b_sim) #ob is omega_b. Shortened to distinguish between new var and function params.
 
@@ -339,7 +365,7 @@ def fwd(p,
 
     rrsd = r_rs_deep(f_rs=frs, omega_b=ob)
 
-    Kd = attenuation.K_d(a=a_sim, b_b=b_b_sim, cos_t_sun_p=ctsp, kappa_0=kappa_0)
+    Kd =  attenuation.K_d(a=a_sim, b_b=b_b_sim, cos_t_sun_p=ctsp, kappa_0=kappa_0)
 
     kuW = attenuation.k_uW(a=a_sim, b_b=b_b_sim, cos_t_sun_p=ctsp, cos_t_view_p=ctvp)
 
@@ -349,8 +375,8 @@ def fwd(p,
 
     Ars2 = A_rs2
 
-    R_rs_sim = air_water.below2above(r_rs_shallow(r_rs_deep=rrsd, K_d=Kd, k_uW=kuW, zB=depth, R_rs_b=Rrsb, k_uB=kuB, A_rs1=Ars1, A_rs2=Ars2))
-
+    R_rs_sim = air_water.below2above(r_rs_shallow(r_rs_deep=rrsd, K_d=Kd, k_uW=kuW, zB=depth, R_rs_b=Rrsb, k_uB=kuB, A_rs1=Ars1, A_rs2=Ars2)) # zeta & gamma
+    
     return R_rs_sim
 '''    
     if params['fit_surface']==True:

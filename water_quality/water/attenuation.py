@@ -97,7 +97,7 @@ def k_uW(a,
     """
     # Math: k_{uW} = \frac{a + b_b}{cos \theta_v'} \times (1 + \omega_b)^{3.5421} \times (1 - \frac{0.2786}{cos \theta_{sun}'})
     """
-    return (a + b_b) / cos_t_sun_p * (1 + omega_b(a, b_b))**3.5421 * (1 - 0.2786 / cos_t_view_p)
+    return (a + b_b) / cos_t_view_p * (1 + omega_b(a, b_b))**3.5421 * (1 - 0.2786 / cos_t_sun_p)
 
 def dk_uW_div_dp(a, 
                  b_b, 
@@ -124,7 +124,7 @@ def k_uB(a,
     """
     # Math: k_{uB} = \frac{a + b_b}{cos \theta_v'} \times (1 + \omega_b)^{2.2658} \times (1 + \frac{0.0577}{cos \theta_{sun}'})
     """
-    return (a + b_b) / cos_t_sun_p * (1 + omega_b(a, b_b))**2.2658 * (1 + 0.0577 / cos_t_view_p)
+    return (a + b_b) / cos_t_view_p * (1 + omega_b(a, b_b))**2.2658 * (1 + 0.0577 / cos_t_sun_p)
 
 def dk_uB_div_dp(a, 
                  
