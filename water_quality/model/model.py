@@ -39,108 +39,9 @@
 
 import numpy as np
 from .. water import absorption, backscattering, attenuation, bottom_reflectance
+from .. water import albert_mobley as water_alg
+from .. atmosphere import sky_radiance, downwelling_irradiance
 from .. surface import surface, air_water
-from .. helper import resampling
-
-def f_rs(omega_b,
-        cos_t_sun_p = np.cos(np.radians(30)),
-        cos_t_view_p = np.cos(np.radians(0))):
-    """
-    # Math: f_{rs} = 0.0512 \times (1 + 4.6659 \times \omega_b - 7.8387 \times \omega_b^2 + 5.4571 \times \omega_b^3) \times (1 + \frac{0.1098}{cos \theta_{sun}'}) \times (1 + \frac{0.4021}{cos \theta_{sun}'})
-    
-    Applying Horner's method:
-    # Math: f_{rs} = 0.0512 \times (1 + \omega_b \times (4.6659 + \omega_b \times(-7.8387 + \omega_b \times (5.4571))) \times (1 + \frac{0.1098}{cos \theta_{sun}'}) \times (1 + \frac{0.4021}{cos \theta_{sun}'})
-    """
-
-    return 0.0512 * (1 + omega_b * (4.6659 + omega_b * (-7.8387 + omega_b * (5.4571)))) * (1 + 0.1098 / cos_t_sun_p) * (1 + 0.4021 / cos_t_view_p)
-    
-def df_rs_div_dp(omega_b,
-                  domega_b_div_dp):
-    """
-    Generalized partial derivative for f_rs with respect to Fit Param (p)
-    The only independent variable of the polynomial f_rs is omega_b
-    and the derivative will have the same underlying for for all lower
-    level variables.
-
-    # Math: f_{rs} = 0.0512 \times (1 + \omega_b \times (4.6659 + \omega_b \times(-7.8387 + \omega_b \times (5.4571))) \times (1 + \frac{0.1098}{cos \theta_{sun}'}) \times (1 + \frac{0.4021}{cos \theta_{sun}'})
-    # Math: \frac{\partial}{\partial p}\left[f_{rs}\right] = 0.0512 \times \frac{\partial \omega_b}{\partial p} \times (4.6659 + \omega_b \times (2 \times  (-7.8387) + \omega_b \times (3 \times 5.4571))
-    # Math: \frac{\partial}{\partial p}\left[f_{rs}\right] = 0.0512 \times \frac{\partial \omega_b}{\partial p} \times (4.6659 + \omega_b \times (-15.6774 + \omega_b \times (16.3713))
-    """
-    return 0.0512 * domega_b_div_dp * (4.6659 + omega_b * (-15.6774 + omega_b * (16.3713)))
-
-
-def r_rs_deep(f_rs, omega_b):
-    """
-    Subsurface radiance reflectance of optically deep water after Albert & Mobley (2003) [1].
-    
-    [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
-
-    :param u: ratio of backscattering coefficient to the sum of absorption and backscattering coefficients
-    :param theta_sun: sun zenith angle in air [radians], is converted to in water using Snell's law, default: np.radians(30)
-    :param theta_view: viewing angle in air in units [radians], is converted to in water using Snell's law, np.radians(0)
-    :param n1: refrective index of origin medium, default: 1 for air
-    :param n2: refrective index of destination medium, default: 1.33 for water
-    :return: subsurface radiance reflectance of deep water [sr-1]
-    """
-    return f_rs * omega_b
-
-def d_r_rs_deep_div_dp(f_rs,
-                       df_rs_div_dp,
-                       omega_b,
-                       domega_b_div_dp):
-    """
-    # Math: \frac{\partial}{\partial p} \left[ f_rs * \omega_b \right] = \frac{\partial f_rs}{\partial p} * \omega_b + f_rs * \frac{\partial \omega_b}{\partial p}
-    """
-    return df_rs_div_dp * omega_b + f_rs * domega_b_div_dp
-
-
-def r_rs_shallow(r_rs_deep,
-                 K_d,
-                 k_uW,
-                 zB,
-                 R_rs_b,
-                 k_uB,
-                 A_rs1=1.1576,
-                 A_rs2=1.0389):
-    """
-    Subsurface radiance reflectance of optically shallow water after Albert & Mobley (2003) [1].
-    
-    [1] Albert & Mobley (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters. [10.1364/OE.11.002873]
-    [2] Heege, T. (2000): Flugzeuggestützte Fernerkundung von Wasserinhaltsstoffen am Bodensee. PhD thesis. DLR-Forschungsbericht 2000-40, 134 p.
-    [3] Albert, A., & Mobley, C. (2003): An analytical model for subsurface irradiance and remote sensing reflectance in deep and shallow case-2 waters [doi.org/10.1364/OE.11.002873]
-
-    # Math: r_{rs}^{sh-} = r_{rs}^{deep-} * \left[ 1 - A_{rs,1} * e^{-(K_d + k_{uW}) * zB} \right] + A_{rs,2} * R_{rs}^b * e^{-(K_d + k_{uB}) * zB}
-    """
-    return r_rs_deep * \
-            (1 - A_rs1 * np.exp(-(K_d + k_uW) * zB)) + \
-            A_rs2 * R_rs_b * np.exp(-(K_d + k_uB) * zB)
-
-def drs_rs_shallow_div_dp(r_rs_deep,
-                          r_rs_deep_div_dp,
-                          K_d,
-                          dK_d_div_dp,
-                          k_uW,
-                          dk_uW_div_dp,
-                          r_rs_b,
-                          d_r_rs_b_div_dp,
-                          k_uB,
-                          dk_uB_div_dp,
-                          zB,
-                          A_rs1=1.1576,
-                          A_rs2=1.0389):
-    """
-    # Math: \frac{\partial}{\partial p}\left[ r_{rs}^{sh-} \right] = \left [ \frac{\partial r_{rs}^{deep-}}{\partial p} * \left[ 1 - A_{rs,1} * e^{-(K_d + k_{uW}) * zB} \right] + r_{rs}^{deep-} * \left[ 1 - A_{rs,1} * \frac{\partial e^{-(K_d + k_{uW}) * zB}}{\partial p} \right] \right] + \left[ A_{rs,2} * \frac{\partial R_{rs}^b}{\partial p} * e^{-(K_d + k_{uB}) * zB} + A_{rs,2} * R_{rs}^b * \frac{\partial e^{-(K_d + k_{uB}) * zB}}{\partial p} \right]
-    # Math: = \left [ \frac{\partial r_{rs}^{deep-}}{\partial p} * \left[ 1 - A_{rs,1} * e^{-(K_d + k_{uW}) * zB} \right] + r_{rs}^{deep-} * \left[ 1 - A_{rs,1} * -(\frac{\partial K_d}{\partial p} + \frac{\partial k_{uW}}{\partial p})e^{-(K_d + k_{uW}) * zB} \right] \right] + \left[ A_{rs,2} * \frac{\partial R_{rs}^b}{\partial p} * e^{-(K_d + k_{uB}) * zB} + A_{rs,2} * R_{rs}^b * -(\frac{\partial K_d}{\partial p} + \frac{\partial k_{uB}}{\partial p}e^{-(K_d + k_{uB}) * zB} \right]
-    """
-    return (d_r_rs_deep_div_dp * (1 - A_rs1 * np.exp(-(K_d + k_uW)*zB)) + \
-            r_rs_deep * (1 - A_rs1 * -(dK_d_div_dp + dk_uW_div_dp)*np.exp(-(K_d + k_uW)*zB))) + \
-            (A_rs2 * d_r_rs_b_div_dp * np.exp(-(K_d + k_uB)*zB) + \
-             A_rs2 * r_rs_b * -(dK_d_div_dp + dk_uB_div_dp) * np.exp(-(K_d + k_uB)))
-
-
-def R_rs(r_rs_minus, zeta=0.52, gamma=1.6):
-    return (zeta * r_rs_minus) / (1 - gamma * r_rs_minus)
-
 
 def residual(R_rs_sim, 
              R_rs,
@@ -161,7 +62,6 @@ def residual(R_rs_sim,
     err = (R_rs-R_rs_sim) * weights
         
     return err
-
 
 def invert(params, 
            R_rs, 
@@ -283,28 +183,40 @@ def invert(params,
 
 # p expected as list:
 # C_0...C_5, C_Y, C_X, C_Mie, S, S_NAP, f_0...f_5
-def fwd(p,
+def fwd(p,              # Fit params only. In list for Scipy compatibility. Using different fit params will necessitate changing this function signature.
         wavelengths,
-        theta_sun,
-        theta_view,
-        depth,
-        n=-1,
-        K=0,
-        kappa_0=1.0546,
-        n1=1,
-        n2=1.33,
+        alpha=1.317,
+        AM=1,
+        beta=0.2606,
+        a_NAP_spec_lambda_0=0.041,
         A_rs1=1.1576,
         A_rs2=1.0389,
-        a_NAP_spec_lambda_0=0.041,
         b_bphy_spec=.001,
         b_bMie_spec=0.0042,
         b_bx_spec=0.0086,
         b_bx_norm_factor=1,
+        depth=2,
+        f_dd=1,
+        f_ds=1,
+        fit_surface=True,
+        fresh=True,
+        H_oz=0.38,
+        K=0,
+        kappa_0=1.0546,
         lambda_0=440,
         lambda_S=500,
+        n=-1,
+        n1=1,
+        n2=1.33,
+        offset=0,
+        P=1013.25,
+        RH=60,
+        rho_L=0.02,
+        theta_sun=np.radians(30),
+        theta_view=0,
         T_W=20,
         T_W_0=20,
-        fresh=True,
+        WV=2.5,
         a_w_res=[],
         da_W_div_dT_res=[],
         a_i_spec_res=[],
@@ -361,9 +273,9 @@ def fwd(p,
 
     ob = attenuation.omega_b(a_sim, b_b_sim) #ob is omega_b. Shortened to distinguish between new var and function params.
 
-    frs = f_rs(omega_b=ob, cos_t_sun_p=ctsp, cos_t_view_p=ctvp)
+    frs = water_alg.f_rs(omega_b=ob, cos_t_sun_p=ctsp, cos_t_view_p=ctvp)
 
-    rrsd = r_rs_deep(f_rs=frs, omega_b=ob)
+    rrsd = water_alg.r_rs_deep(f_rs=frs, omega_b=ob)
 
     Kd =  attenuation.K_d(a=a_sim, b_b=b_b_sim, cos_t_sun_p=ctsp, kappa_0=kappa_0)
 
@@ -375,39 +287,57 @@ def fwd(p,
 
     Ars2 = A_rs2
 
-    R_rs_sim = air_water.below2above(r_rs_shallow(r_rs_deep=rrsd, K_d=Kd, k_uW=kuW, zB=depth, R_rs_b=Rrsb, k_uB=kuB, A_rs1=Ars1, A_rs2=Ars2)) # zeta & gamma
+    R_rs_sim = air_water.below2above(water_alg.r_rs_shallow(r_rs_deep=rrsd, K_d=Kd, k_uW=kuW, zB=depth, R_rs_b=Rrsb, k_uB=kuB, A_rs1=Ars1, A_rs2=Ars2)) # zeta & gamma
+    
+        
+    if fit_surface==True:
+        L_s = sky_radiance.L_s(wavelengths=wavelengths,
+            theta_sun=theta_sun,
+            P=P,
+            AM=AM,
+            RH=RH,
+            H_oz=H_oz,
+            WV=WV,
+            alpha=alpha,
+            beta=beta,
+            g_dd=p[17],
+            g_dsr=p[18],
+            g_dsa=p[19],
+            E_0_res=E_0_res,
+            a_oz_res=a_oz_res,
+            a_ox_res=a_ox_res,
+            a_wv_res=a_wv_res,
+            E_dd_res=E_dd_res,
+            E_dsa_res=E_dsa_res,
+            E_dsr_res=E_dsr_res)
+        
+        E_d = downwelling_irradiance.E_d(
+            wavelengths=wavelengths,
+            theta_sun=theta_sun,
+            P=P,
+            AM=AM,
+            RH=RH,
+            H_oz=H_oz,
+            WV=WV,
+            alpha=alpha,
+            beta=beta,
+            f_dd=f_dd,
+            f_ds=f_ds, 
+            E_0_res=E_0_res,
+            a_oz_res=a_oz_res,
+            a_ox_res=a_ox_res,
+            a_wv_res=a_wv_res,
+            E_dd_res=E_dd_res,
+            E_dsa_res=E_dsa_res,
+            E_dsr_res=E_dsr_res,
+            E_d_res=E_d_res)
+
+        R_rs_sim += surface.R_rs_surf(L_s, E_d, rho_L)
+
+    else:
+        R_rs_sim += offset
     
     return R_rs_sim
-'''    
-    if params['fit_surface']==True:
-        R_rs_sim += surface.R_rs_surf(wavelengths = wavelengths, 
-                                      theta_sun=params['theta_sun'], 
-                                      P=params['P'], 
-                                      AM=params['AM'], 
-                                      RH=params['RH'], 
-                                      H_oz=params['H_oz'], 
-                                      WV=params['WV'], 
-                                      alpha=params['alpha'],
-                                      beta=params['beta'],
-                                      g_dd=params['g_dd'],
-                                      g_dsr=params['g_dsr'],
-                                      g_dsa=params['g_dsa'],
-                                      f_dd=params['f_dd'], 
-                                      f_ds=params['f_ds'],
-                                      rho_L=params['rho_L'],
-                                      E_0_res=E_0_res,
-                                      a_oz_res=a_oz_res,
-                                      a_ox_res=a_ox_res,
-                                      a_wv_res=a_wv_res,
-                                      E_dd_res=E_dd_res,
-                                      E_dsa_res=E_dsa_res,
-                                      E_dsr_res=E_dsr_res,
-                                      E_d_res=E_d_res)
-    else:
-        R_rs_sim += params['offset']
-''' 
-
-    
 
 def wrap(outerfunc, *outer_args, **outer_kwargs):
       def inner_func(*inner_args, **inner_kwargs):
@@ -415,7 +345,6 @@ def wrap(outerfunc, *outer_args, **outer_kwargs):
             kwargs = {**outer_kwargs, **inner_kwargs}
             return outerfunc(*args, **kwargs)
       return inner_func
-
 
 def build_jac(params):
     """

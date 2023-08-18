@@ -92,8 +92,17 @@ def L_s(wavelengths=np.arange(400,800),
     :return: sky radiance in W/m2 nm sr
     
     """
-    L_s = g_dd * downwelling_irradiance.E_dd(wavelengths=wavelengths, theta_sun=theta_sun, P=P, AM=AM, RH=RH, H_oz=H_oz, WV=WV, alpha=alpha, beta=beta, E_0_res=E_0_res, a_oz_res=a_oz_res, a_ox_res=a_ox_res, a_wv_res=a_wv_res, E_dd_res=E_dd_res) + \
+    L_s = g_dd *  downwelling_irradiance.E_dd(wavelengths=wavelengths,  theta_sun=theta_sun, P=P, AM=AM, RH=RH, H_oz=H_oz, WV=WV, alpha=alpha, beta=beta, E_0_res=E_0_res, a_oz_res=a_oz_res, a_ox_res=a_ox_res, a_wv_res=a_wv_res, E_dd_res=E_dd_res) + \
           g_dsr * downwelling_irradiance.E_dsr(wavelengths=wavelengths, theta_sun=theta_sun, P=P, AM=AM, RH=RH, H_oz=H_oz, WV=WV, E_0_res=E_0_res, a_oz_res=a_oz_res, a_ox_res=a_ox_res, a_wv_res=a_wv_res, E_dsr_res=E_dsr_res) + \
           g_dsa * downwelling_irradiance.E_dsa(wavelengths=wavelengths, theta_sun=theta_sun, P=P, AM=AM, RH=RH, H_oz=H_oz, WV=WV, alpha=alpha, E_0_res=E_0_res, a_oz_res=a_oz_res, a_ox_res=a_ox_res, a_wv_res=a_wv_res, E_dsa_res=E_dsa_res)
     
     return L_s
+
+def d_LS_div_dg_dd():
+    pass
+
+def d_LS_div_dg_dsr():
+    pass
+
+def d_LS_div_dg_dsa():
+    pass

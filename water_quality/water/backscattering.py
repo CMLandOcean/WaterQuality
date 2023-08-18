@@ -125,7 +125,9 @@ def db_bphy_div_dC_phy(wavelengths: np.array = np.arange(400,800),
     
     return db_bphy_div_dC_phy
 
-
+def b_bX_norm(b_bX_norm_factor=1, wavelengths=np.arange(400,800)):
+    return np.ones(wavelengths.shape) * b_bX_norm_factor
+    
 def b_bX(C_X: float = 0,
         wavelengths: np.array = np.arange(400,800),
         b_bX_spec: float = 0.0086,
@@ -172,6 +174,9 @@ def db_bX_div_dC_X(wavelengths: np.array = np.arange(400,800),
     
     return b_bX_div_C_X
 
+
+def b_bMie_norm(wavelengths=np.arange(400, 800), lambda_S=500, n=-1):
+    return (wavelengths/lambda_S)**n
 
 def b_bMie(C_Mie: float = 0,
         wavelengths: np.array = np.arange(400,800),

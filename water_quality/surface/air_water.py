@@ -57,9 +57,11 @@ def below2above(r_rs, zeta=0.52, Gamma=1.6):
 
 def dbelow2above_div_dp(r_rs, dr_rs_div_dp, zeta=0.52, Gamma=1.6):
     """
-    # Math: \frac{\partial}{\partial p}R_{rs} = \frac{\partial}{\partial p}\left[\frac{\zeta r_{rs}^*} {1 - \Gamma r_{rs}^- } \right] = \zeta\frac{\partial r_{rs}^*}{\partial p}\left[\frac{1 - 2 * \Gamma r_{rs}^*}{(1 - \Gamma r_{rs}^*)^2} \right]
+    # Math: \frac{\partial}{\partial p}R_{rs} = \frac{\partial}{\partial p}\left[\frac{\zeta r_{rs}^-} {1 - \Gamma r_{rs}^- } \right] 
+    # Math: = \zeta \frac{\partial r_{rs}^-}{\partial p} \left[ \frac{1}{1 - \Gamma r_{rs}^-} \right] + \zeta r_{rs}^- \left[\frac{1}{(1 - \Gamma r_{rs}^-)^2} \Gamma \frac{\partial r_{rs}^-}{\partial p} \right]
+    # Math: = \zeta \frac{\partial r_{rs}^-}{\partial p} \frac{1}{(1 - \Gamma r_{rs}^-)^2}
     """
-    return zeta * dr_rs_div_dp * (1 - 2 * (r_rs * Gamma)) / (1 - r_rs * Gamma)**2 
+    return zeta * dr_rs_div_dp * (1 - Gamma * r_rs)**-2
     
 
 def above2below(R_rs, zeta=0.52, Gamma=1.6):
