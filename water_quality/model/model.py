@@ -299,7 +299,7 @@ def fun(p,              # Fit params only. In list for Scipy compatibility. Usin
 
         L_s = sky_radiance.L_s(p[17], E_dd, p[18], E_dsr, p[19], E_dsa)
 
-        R_rs_sim += surface.R_rs_surf(L_s, E_d, rho_L)
+        R_rs_sim += surface.R_rs_surf(L_s, E_d, rho_L) + offset
 
     else:
         R_rs_sim += offset
@@ -412,21 +412,21 @@ def dfun(p,
 
     R_rs_water = air_water.below2above(water_alg.r_rs_shallow(r_rs_deep=rrsd, K_d=Kd, k_uW=kuW, zB=depth, R_rs_b=Rrsb, k_uB=kuB, A_rs1=Ars1, A_rs2=Ars2)) # zeta & gamma
             
-    if fit_surface==True:
-        E_dd  = downwelling_irradiance.E_dd(wavelengths, theta_sun, P, AM, RH, H_oz, WV, alpha, beta, E_0_res, a_oz_res, a_ox_res, a_wv_res, E_dd_res)
-        E_dsr = downwelling_irradiance.E_dsr(wavelengths, theta_sun, P, AM, RH, H_oz, WV, E_0_res, a_oz_res, a_ox_res, a_wv_res, E_dsr_res)
-        E_dsa = downwelling_irradiance.E_dsa(wavelengths, theta_sun, P, AM, RH, H_oz, WV, alpha, beta, E_0_res, a_oz_res, a_ox_res, a_wv_res, E_dsa_res)
+    # if fit_surface==True:
+    E_dd  = downwelling_irradiance.E_dd(wavelengths, theta_sun, P, AM, RH, H_oz, WV, alpha, beta, E_0_res, a_oz_res, a_ox_res, a_wv_res, E_dd_res)
+    E_dsr = downwelling_irradiance.E_dsr(wavelengths, theta_sun, P, AM, RH, H_oz, WV, E_0_res, a_oz_res, a_ox_res, a_wv_res, E_dsr_res)
+    E_dsa = downwelling_irradiance.E_dsa(wavelengths, theta_sun, P, AM, RH, H_oz, WV, alpha, beta, E_0_res, a_oz_res, a_ox_res, a_wv_res, E_dsa_res)
 
-        E_ds = downwelling_irradiance.E_ds(E_dsr, E_dsa)
+    E_ds = downwelling_irradiance.E_ds(E_dsr, E_dsa)
 
-        E_d = downwelling_irradiance.E_d(f_dd, E_dd, f_ds, E_ds)
+    E_d = downwelling_irradiance.E_d(f_dd, E_dd, f_ds, E_ds)
 
-        L_s = sky_radiance.L_s(p[17], E_dd, p[18], E_dsr, p[19], E_dsa)
+    L_s = sky_radiance.L_s(p[17], E_dd, p[18], E_dsr, p[19], E_dsa)
 
-        R_rs_surface = surface.R_rs_surf(L_s, E_d, rho_L)
+    R_rs_surface = surface.R_rs_surf(L_s, E_d, rho_L) # + offset
 
-    else:
-        R_rs_surface = offset
+    # else:
+    #     R_rs_surface = offset
 
     dbdcphy = backscattering.db_b_div_dC_phy(wavelengths, b_bphy_spec, b_phy_norm_res)
 
