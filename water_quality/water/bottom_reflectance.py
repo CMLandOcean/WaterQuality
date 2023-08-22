@@ -91,12 +91,6 @@ def R_rs_b(f_0 = 0,
     return R_rs_b
 
 def dR_rs_b_div_df_i(i, 
-           f_0 = 0,
-           f_1 = 0,
-           f_2 = 0,
-           f_3 = 0,
-           f_4 = 0,
-           f_5 = 0,
            B_0 = 1/np.pi, 
            B_1 = 1/np.pi, 
            B_2 = 1/np.pi, 

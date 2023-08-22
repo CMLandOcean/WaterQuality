@@ -83,7 +83,7 @@ def r_rs_deep(f_rs, omega_b):
     """
     return f_rs * omega_b
 
-def d_r_rs_deep_div_dp(f_rs,
+def dr_rs_deep_div_dp(f_rs,
                        df_rs_div_dp,
                        omega_b,
                        domega_b_div_dp):
@@ -115,7 +115,7 @@ def r_rs_shallow(r_rs_deep,
             A_rs2 * R_rs_b * np.exp(-(K_d + k_uB) * zB)
 
 def drs_rs_shallow_div_dp(r_rs_deep,
-                          r_rs_deep_div_dp,
+                          dr_rs_deep_div_dp,
                           K_d,
                           dK_d_div_dp,
                           k_uW,
@@ -131,7 +131,7 @@ def drs_rs_shallow_div_dp(r_rs_deep,
     # Math: \frac{\partial}{\partial p}\left[ r_{rs}^{sh-} \right] = \left [ \frac{\partial r_{rs}^{deep-}}{\partial p} * \left[ 1 - A_{rs,1} * e^{-(K_d + k_{uW}) * zB} \right] + r_{rs}^{deep-} * \left[ 1 - A_{rs,1} * \frac{\partial e^{-(K_d + k_{uW}) * zB}}{\partial p} \right] \right] + \left[ A_{rs,2} * \frac{\partial R_{rs}^b}{\partial p} * e^{-(K_d + k_{uB}) * zB} + A_{rs,2} * R_{rs}^b * \frac{\partial e^{-(K_d + k_{uB}) * zB}}{\partial p} \right]
     # Math: = \left [ \frac{\partial r_{rs}^{deep-}}{\partial p} * \left[ 1 - A_{rs,1} * e^{-(K_d + k_{uW}) * zB} \right] + r_{rs}^{deep-} * \left[ 1 - A_{rs,1} * -(\frac{\partial K_d}{\partial p} + \frac{\partial k_{uW}}{\partial p})e^{-(K_d + k_{uW}) * zB} \right] \right] + \left[ A_{rs,2} * \frac{\partial R_{rs}^b}{\partial p} * e^{-(K_d + k_{uB}) * zB} + A_{rs,2} * R_{rs}^b * -(\frac{\partial K_d}{\partial p} + \frac{\partial k_{uB}}{\partial p}e^{-(K_d + k_{uB}) * zB} \right]
     """
-    return (d_r_rs_deep_div_dp * (1 - A_rs1 * np.exp(-(K_d + k_uW)*zB)) + \
+    return (dr_rs_deep_div_dp * (1 - A_rs1 * np.exp(-(K_d + k_uW)*zB)) + \
             r_rs_deep * (1 - A_rs1 * -(dK_d_div_dp + dk_uW_div_dp)*np.exp(-(K_d + k_uW)*zB))) + \
             (A_rs2 * d_r_rs_b_div_dp * np.exp(-(K_d + k_uB)*zB) + \
              A_rs2 * r_rs_b * -(dK_d_div_dp + dk_uB_div_dp) * np.exp(-(K_d + k_uB)))
