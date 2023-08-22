@@ -56,10 +56,9 @@ def residual(R_rs_sim,
     """
     
     if len(weights)==0:
-        weights = np.ones(len(R_rs))
-    
-    # sum absolute differences
-    err = (R_rs-R_rs_sim) * weights
+        err = (R_rs-R_rs_sim)
+    else:
+        err = (R_rs-R_rs_sim) * weights
         
     return err
 
