@@ -426,15 +426,13 @@ def da_div_dC_X(
     return da_NAP_div_dC_X(wavelengths=wavelengths, lambda_0=lambda_0, a_NAP_spec_lambda_0=a_NAP_spec_lambda_0, S_NAP=S_NAP, a_NAP_N_res=a_NAP_N_res)
 
 def da_div_dC_Mie(
-      C_X = 0, 
-      C_Mie = 0,
       wavelengths = np.arange(400,800),
       lambda_0 = 440,
       a_NAP_spec_lambda_0 = 0.041,
       S_NAP = 0.011,
       a_NAP_N_res=[]
       ):
-    return da_NAP_div_dC_Mie(C_X=C_X, C_Mie=C_Mie, wavelengths=wavelengths, lambda_0=lambda_0, a_NAP_spec_lambda_0=a_NAP_spec_lambda_0, S_NAP=S_NAP, a_NAP_N_res=a_NAP_N_res)
+    return da_NAP_div_dC_Mie(wavelengths=wavelengths, lambda_0=lambda_0, a_NAP_spec_lambda_0=a_NAP_spec_lambda_0, S_NAP=S_NAP, a_NAP_N_res=a_NAP_N_res)
 
 def da_div_dS_NAP(C_i,
       C_X = 0, 

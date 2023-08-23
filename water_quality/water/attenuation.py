@@ -92,15 +92,17 @@ def dK_d_div_dp(da_div_dp,
 
 def k_uW(a,
          b_b,
+         omega_b,
          cos_t_sun_p,
          cos_t_view_p):
     """
     # Math: k_{uW} = \frac{a + b_b}{cos \theta_v'} \times (1 + \omega_b)^{3.5421} \times (1 - \frac{0.2786}{cos \theta_{sun}'})
     """
-    return (a + b_b) / cos_t_view_p * (1 + omega_b(a, b_b))**3.5421 * (1 - 0.2786 / cos_t_sun_p)
+    return (a + b_b) / cos_t_view_p * (1 + omega_b)**3.5421 * (1 - 0.2786 / cos_t_sun_p)
 
 def dk_uW_div_dp(a, 
-                 b_b, 
+                 b_b,
+                 omega_b,
                  da_div_dp, 
                  db_b_div_dp, 
                  cos_t_sun_p, 
@@ -119,16 +121,17 @@ def dk_uW_div_dp(a,
 
 def k_uB(a,
          b_b,
+         omega_b,
          cos_t_sun_p,
          cos_t_view_p):
     """
     # Math: k_{uB} = \frac{a + b_b}{cos \theta_v'} \times (1 + \omega_b)^{2.2658} \times (1 + \frac{0.0577}{cos \theta_{sun}'})
     """
-    return (a + b_b) / cos_t_view_p * (1 + omega_b(a, b_b))**2.2658 * (1 + 0.0577 / cos_t_sun_p)
+    return (a + b_b) / cos_t_view_p * (1 + omega_b)**2.2658 * (1 + 0.0577 / cos_t_sun_p)
 
 def dk_uB_div_dp(a, 
-                 
-                 b_b, 
+                 b_b,
+                 omega_b, 
                  da_div_dp, 
                  db_b_div_dp, 
                  cos_t_sun_p, 
