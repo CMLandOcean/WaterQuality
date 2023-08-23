@@ -293,7 +293,7 @@ def fun(p,              # Fit params only. In list for Scipy compatibility. Usin
         
         E_dsr = downwelling_irradiance.E_dsr(wavelengths, theta_sun, P, AM, RH, H_oz, WV, E_0_res, a_oz_res, a_ox_res, a_wv_res, E_dsr_res)
         E_dsa = downwelling_irradiance.E_dsa(wavelengths, theta_sun, P, AM, RH, H_oz, WV, alpha, beta, E_0_res, a_oz_res, a_ox_res, a_wv_res, E_dsa_res)
-        E_ds = downwelling_irradiance.E_ds(E_dsr, E_dsa)
+        E_ds  = downwelling_irradiance.E_ds(E_dsr, E_dsa)
 
         E_d = downwelling_irradiance.E_d(f_dd, E_dd, f_ds, E_ds)
 
@@ -306,7 +306,7 @@ def fun(p,              # Fit params only. In list for Scipy compatibility. Usin
     
     return R_rs_sim
 
-def dfun(p, 
+def dfun(p,
         wavelengths,
         alpha=1.317,
         AM=1,
