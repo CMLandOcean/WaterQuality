@@ -54,7 +54,9 @@ def f_rs(omega_b,
     return 0.0512 * (1 + omega_b * (4.6659 + omega_b * (-7.8387 + omega_b * (5.4571)))) * (1 + 0.1098 / cos_t_sun_p) * (1 + 0.4021 / cos_t_view_p)
     
 def df_rs_div_dp(omega_b,
-                  domega_b_div_dp):
+                domega_b_div_dp,
+                cos_t_sun_p = np.cos(np.radians(30)),
+                cos_t_view_p = np.cos(np.radians(0))):
     """
     Generalized partial derivative for f_rs with respect to Fit Param (p)
     The only independent variable of the polynomial f_rs is omega_b
@@ -65,7 +67,7 @@ def df_rs_div_dp(omega_b,
     # Math: \frac{\partial}{\partial p}\left[f_{rs}\right] = 0.0512 \times \frac{\partial \omega_b}{\partial p} \times (4.6659 + \omega_b \times (2 \times  (-7.8387) + \omega_b \times (3 \times 5.4571))
     # Math: \frac{\partial}{\partial p}\left[f_{rs}\right] = 0.0512 \times \frac{\partial \omega_b}{\partial p} \times (4.6659 + \omega_b \times (-15.6774 + \omega_b \times (16.3713))
     """
-    return 0.0512 * domega_b_div_dp * (4.6659 + omega_b * (-15.6774 + omega_b * (16.3713)))
+    return 0.0512 * (1 + 0.1098 / cos_t_sun_p) * (1 + 0.4021 / cos_t_view_p) * domega_b_div_dp * (4.6659 + omega_b * ((-15.6774) + (16.3713) * omega_b))
 
 
 def r_rs_deep(f_rs, omega_b):
@@ -84,11 +86,11 @@ def r_rs_deep(f_rs, omega_b):
     return f_rs * omega_b
 
 def dr_rs_deep_div_dp(f_rs,
-                       df_rs_div_dp,
-                       omega_b,
-                       domega_b_div_dp):
+                      df_rs_div_dp,
+                      omega_b,
+                      domega_b_div_dp):
     """
-    # Math: \frac{\partial}{\partial p} \left[ f_rs * \omega_b \right] = \frac{\partial f_rs}{\partial p} * \omega_b + f_rs * \frac{\partial \omega_b}{\partial p}
+    # Math: \frac{\partial}{\partial p} \left[ f_{rs} * \omega_b \right] = \frac{\partial f_{rs}}{\partial p} * \omega_b + f_{rs} * \frac{\partial \omega_b}{\partial p}
     """
     return df_rs_div_dp * omega_b + f_rs * domega_b_div_dp
 
@@ -131,12 +133,16 @@ def drs_rs_shallow_div_dp(r_rs_deep,
     # Math: \frac{\partial}{\partial p}\left[ r_{rs}^{sh-} \right] = \left [ \frac{\partial r_{rs}^{deep-}}{\partial p} * \left[ 1 - A_{rs,1} * e^{-(K_d + k_{uW}) * zB} \right] + r_{rs}^{deep-} * \left[ 1 - A_{rs,1} * \frac{\partial e^{-(K_d + k_{uW}) * zB}}{\partial p} \right] \right] + \left[ A_{rs,2} * \frac{\partial R_{rs}^b}{\partial p} * e^{-(K_d + k_{uB}) * zB} + A_{rs,2} * R_{rs}^b * \frac{\partial e^{-(K_d + k_{uB}) * zB}}{\partial p} \right]
     # Math: = \left [ \frac{\partial r_{rs}^{deep-}}{\partial p} * \left[ 1 - A_{rs,1} * e^{-(K_d + k_{uW}) * zB} \right] + r_{rs}^{deep-} * \left[ 1 - A_{rs,1} * -(\frac{\partial K_d}{\partial p} + \frac{\partial k_{uW}}{\partial p})e^{-(K_d + k_{uW}) * zB} \right] \right] + \left[ A_{rs,2} * \frac{\partial R_{rs}^b}{\partial p} * e^{-(K_d + k_{uB}) * zB} + A_{rs,2} * R_{rs}^b * -(\frac{\partial K_d}{\partial p} + \frac{\partial k_{uB}}{\partial p}e^{-(K_d + k_{uB}) * zB} \right]
     """
-    return (dr_rs_deep_div_dp * (1 - A_rs1 * np.exp(-(K_d + k_uW)*zB)) + \
-            r_rs_deep * (1 - A_rs1 * -(dK_d_div_dp + dk_uW_div_dp)*np.exp(-(K_d + k_uW)*zB))) + \
-            (A_rs2 * d_r_rs_b_div_dp * np.exp(-(K_d + k_uB)*zB) + \
-             A_rs2 * r_rs_b * -(dK_d_div_dp + dk_uB_div_dp) * np.exp(-(K_d + k_uB)))
+    eW = np.exp(-(K_d + k_uW) * zB)
+    deW = -zB * (dK_d_div_dp + dk_uW_div_dp) * eW
+    eB = np.exp(-(K_d + k_uB) * zB)
+    deB = -zB * (dK_d_div_dp + dk_uB_div_dp) * eB
 
-
-def R_rs(r_rs_minus, zeta=0.52, gamma=1.6):
-    return (zeta * r_rs_minus) / (1 - gamma * r_rs_minus)
+    return dr_rs_deep_div_dp * (1 - A_rs1 * eW) + \
+            r_rs_deep * (-A_rs1 * deW) + \
+            A_rs2 * \
+            (
+                d_r_rs_b_div_dp * eB + \
+                r_rs_b * deB
+            )
 

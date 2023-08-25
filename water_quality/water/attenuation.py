@@ -49,9 +49,10 @@ def omega_b(a, b_b):
 def domega_b_div_dp(a, b_b, da_div_dp, db_b_div_dp):
     """
     # Math: \frac{\partial}{\partial p}\left[\omega_b\right] = \frac{\partial}{\partial p}\left[ b_b \times (a+b_b)^{-1} \right]
-    # Math: =\frac{\partial b_b}{\partial p} (a + b_b)^{-1} - b_b(a+b_b)(\frac{\partial a}{\partial p} + \frac{\partial b_b}{\partial p})
+    # Math: =\frac{\partial b_b}{\partial p} (a + b_b)^{-1} - b_b(a+b_b)^{-2}(\frac{\partial a}{\partial p} + \frac{\partial b_b}{\partial p})
+    # Math: = \frac{a\partial_p b - b \partial_pa}{(a + b_b)^2}
     """
-    return (db_b_div_dp / (a + b_b)) - (b_b * (a + b_b) * (da_div_dp + db_b_div_dp))
+    return (a * db_b_div_dp - b_b * da_div_dp) / (a + b_b)**2
 
 # Attentuation partials have the same form for all fit params
 # References to theta all invoke cos(theta). Expect np.cos(theta) as param instead.
@@ -104,7 +105,8 @@ def dk_uW_div_dp(a,
                  b_b,
                  omega_b,
                  da_div_dp, 
-                 db_b_div_dp, 
+                 db_b_div_dp,
+                 domega_b_div_dp,
                  cos_t_sun_p, 
                  cos_t_view_p):
     """
@@ -114,8 +116,10 @@ def dk_uW_div_dp(a,
     """
 
     return 1/cos_t_sun_p * \
-          (((da_div_dp + db_b_div_dp) * (1 + omega_b**(3.5421)) + \
-          (a + b_b) * (3.5421 * (1 + omega_b**(2.5421)) * domega_b_div_dp(a, b_b, da_div_dp, db_b_div_dp)))) * \
+          (
+            ((da_div_dp + db_b_div_dp) * (1 + omega_b)**(3.5421) + \
+             (a + b_b) * (3.5421 * (1 + omega_b)**(2.5421) * domega_b_div_dp))
+          ) * \
           (1 - 0.2786/ cos_t_view_p)
 
 
@@ -133,7 +137,8 @@ def dk_uB_div_dp(a,
                  b_b,
                  omega_b, 
                  da_div_dp, 
-                 db_b_div_dp, 
+                 db_b_div_dp,
+                 domega_b_div_dp,
                  cos_t_sun_p, 
                  cos_t_view_p):
     """
@@ -142,7 +147,9 @@ def dk_uB_div_dp(a,
     # Math: = \frac{1}{cos \theta_v'}\left[ (\frac{\partial a}{\partial p} + \frac{\partial b}{\partial p}) \times (1 + \omega_b)^{2.2658} + (a + b) \times (2.2658 \times (1 + \omega_b)^{1.2658} \times \frac{\partial \omega_b}{\partial p}) \right] \times (1 + \frac{0.0577}{cos \theta_{sun}'})
     """
     return 1/cos_t_sun_p * \
-          (((da_div_dp + db_b_div_dp) * (1 + omega_b**(2.2658)) + \
-          (a + b_b) * (2.2658 * (1 + omega_b**(1.2658)) * domega_b_div_dp(a, b_b, da_div_dp, db_b_div_dp)))) * \
+          (
+            ((da_div_dp + db_b_div_dp) * (1 + omega_b)**(2.2658) + \
+             (a + b_b) * (2.2658 * (1 + omega_b)**(1.2658) * domega_b_div_dp))
+          ) * \
           (1 + 0.0577 / cos_t_view_p)
 

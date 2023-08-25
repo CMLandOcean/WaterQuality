@@ -136,7 +136,8 @@ def dR_rs_b_div_dB_i(i,
     
     if len(R_i_b_res)==0:
         R_i_b = resampling.resample_R_i_b(wavelengths=wavelengths)
-    else: R_i_b = R_i_b_res
+    else: 
+        R_i_b = R_i_b_res
     
     dR_rs_b_div_dB_i = f_i[i] * R_i_b.T[i]
     
