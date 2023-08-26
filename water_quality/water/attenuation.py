@@ -152,4 +152,3 @@ def dk_uB_div_dp(a,
              (a + b_b) * (2.2658 * (1 + omega_b)**(1.2658) * domega_b_div_dp))
           ) * \
           (1 + 0.0577 / cos_t_view_p)
-

@@ -125,6 +125,7 @@ def db_bphy_div_dC_phy(wavelengths: np.array = np.arange(400,800),
     
     return db_bphy_div_dC_phy
 
+
 def b_bX_norm(b_bX_norm_factor=1, wavelengths=np.arange(400,800)):
     return np.ones(wavelengths.shape) * b_bX_norm_factor
     

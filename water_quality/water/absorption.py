@@ -206,8 +206,10 @@ def a_ph(C_0 = 0,
     else:
         a_i_spec = a_i_spec_res
     
-    a_ph = np.sum([C_i[i] * a_i_spec.T[i] for i in np.arange(a_i_spec.shape[1])], axis=0)
+    a_ph = 0
     
+    for i in range(a_i_spec.shape[1]): a_ph += C_i[i] * a_i_spec[:, i]
+
     return a_ph
 
 def da_ph_div_dCi(i,
@@ -397,8 +399,8 @@ def da_div_dC_i(i,
       a_i_spec_res=[],
       ):
     """
-    # Math: a_{wc} = a_{CDOM} + a_{phy} + a_{NAP}
     # Math: a(\lambda) = \left[ a_w(\lambda) + (T - T_0)\frac{da_w(\lambda)}{dT} \right] + a_{wc}(\lambda)
+    # Math: a_{wc} = a_{CDOM} + a_{phy} + a_{NAP}
     # Math: \frac{\partial}{\partial C_0} a(\lambda) = \frac{\partial}{\partial C_0} a_{phy}
     """
     return da_ph_div_dCi(i, wavelengths=wavelengths, a_i_spec_res=a_i_spec_res)

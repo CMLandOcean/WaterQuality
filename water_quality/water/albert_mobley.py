@@ -137,7 +137,7 @@ def drs_rs_shallow_div_dp(r_rs_deep,
     deW = -zB * (dK_d_div_dp + dk_uW_div_dp) * eW
     eB = np.exp(-(K_d + k_uB) * zB)
     deB = -zB * (dK_d_div_dp + dk_uB_div_dp) * eB
-
+    
     return dr_rs_deep_div_dp * (1 - A_rs1 * eW) + \
             r_rs_deep * (-A_rs1 * deW) + \
             A_rs2 * \
@@ -145,4 +145,3 @@ def drs_rs_shallow_div_dp(r_rs_deep,
                 d_r_rs_b_div_dp * eB + \
                 r_rs_b * deB
             )
-
