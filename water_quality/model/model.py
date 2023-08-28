@@ -86,6 +86,12 @@ def fun(p,              # Fit params only. In list for Scipy compatibility. Usin
         b_bx_spec=0.0086,
         b_bx_norm_factor=1,
         beta=0.2606,
+        B_0=1/np.pi,
+        B_1=1/np.pi,
+        B_2=1/np.pi,
+        B_3=1/np.pi,
+        B_4=1/np.pi,
+        B_5=1/np.pi,
         depth=2,
         f_dd=1,
         f_ds=1,
@@ -133,7 +139,7 @@ def fun(p,              # Fit params only. In list for Scipy compatibility. Usin
     ctvp = np.cos(air_water.snell(theta_view, n1=n1, n2=n2))
 
     a_sim = absorption.a(C_0=p[0], C_1=p[1], C_2=p[2], C_3=p[3], C_4=p[4], C_5=p[5], 
-                        C_Y=p[6], C_X=p[7], C_Mie=0.1, S=0.014, 
+                        C_Y=p[6], C_X=p[7], C_Mie=p[8], S=0.014, 
                         S_NAP=0.011, 
                         a_NAP_spec_lambda_0=a_NAP_spec_lambda_0,
                         lambda_0=lambda_0,
@@ -147,7 +153,7 @@ def fun(p,              # Fit params only. In list for Scipy compatibility. Usin
                         a_Y_N_res=a_Y_N_res,
                         a_NAP_N_res=a_NAP_N_res)
     
-    b_b_sim = backscattering.b_b(C_X=p[7], C_Mie=0.1, C_phy=np.sum(p[0:6]), wavelengths=wavelengths, 
+    b_b_sim = backscattering.b_b(C_X=p[7], C_Mie=p[8], C_phy=np.sum(p[0:6]), wavelengths=wavelengths, 
                         fresh=fresh,
                         b_bphy_spec=b_bphy_spec,
                         b_bMie_spec=b_bMie_spec,
@@ -160,7 +166,7 @@ def fun(p,              # Fit params only. In list for Scipy compatibility. Usin
                         b_X_norm_res=b_X_norm_res, 
                         b_Mie_norm_res=b_Mie_norm_res)
 
-    Rrsb = bottom_reflectance.R_rs_b(p[9], p[10], p[11], p[12], p[13], p[14], wavelengths=wavelengths, R_i_b_res=R_i_b_res)
+    Rrsb = bottom_reflectance.R_rs_b(p[9], p[10], p[11], p[12], p[13], p[14], B_0=B_0, B_1=B_1, B_2=B_2, B_3=B_3, B_4=B_4, B_5=B_5, wavelengths=wavelengths, R_i_b_res=R_i_b_res)
 
     ob = attenuation.omega_b(a_sim, b_b_sim) #ob is omega_b. Shortened to distinguish between new var and function params.
 
@@ -208,8 +214,8 @@ def fun(p,              # Fit params only. In list for Scipy compatibility. Usin
         R_rs_surface = surface.R_rs_surf(L_s, E_d, rho_L)
 
         R_rs_sim = R_rs_water + R_rs_surface + offset
-
-        return R_rs_sim    
+        return R_rs_sim
+     
     else:
         R_rs_sim = R_rs_water + offset
         return R_rs_sim
@@ -226,6 +232,12 @@ def dfun(p,
         b_bx_spec=0.0086,
         b_bx_norm_factor=1,
         beta=0.2606,
+        B_0=1/np.pi,
+        B_1=1/np.pi,
+        B_2=1/np.pi,
+        B_3=1/np.pi,
+        B_4=1/np.pi,
+        B_5=1/np.pi,
         depth=2,
         f_dd=1,
         f_ds=1,
@@ -271,7 +283,7 @@ def dfun(p,
     ctvp = np.cos(air_water.snell(theta_view, n1=n1, n2=n2))
 
     a_sim = absorption.a(C_0=p[0], C_1=p[1], C_2=p[2], C_3=p[3], C_4=p[4], C_5=p[5], 
-                        C_Y=p[6], C_X=p[7], C_Mie=0.1, S=0.014, 
+                        C_Y=p[6], C_X=p[7], C_Mie=p[8], S=0.014, 
                         S_NAP=0.011, 
                         a_NAP_spec_lambda_0=a_NAP_spec_lambda_0,
                         lambda_0=lambda_0,
@@ -285,7 +297,7 @@ def dfun(p,
                         a_Y_N_res=a_Y_N_res,
                         a_NAP_N_res=a_NAP_N_res)
     
-    b_b_sim = backscattering.b_b(C_X=p[7], C_Mie=0.1, C_phy=np.sum(p[0:6]), wavelengths=wavelengths, 
+    b_b_sim = backscattering.b_b(C_X=p[7], C_Mie=p[8], C_phy=np.sum(p[0:6]), wavelengths=wavelengths, 
                         fresh=fresh,
                         b_bphy_spec=b_bphy_spec,
                         b_bMie_spec=b_bMie_spec,
@@ -298,7 +310,7 @@ def dfun(p,
                         b_X_norm_res=b_X_norm_res, 
                         b_Mie_norm_res=b_Mie_norm_res)
 
-    Rrsb = bottom_reflectance.R_rs_b(p[9], p[10], p[11], p[12], p[13], p[14], wavelengths=wavelengths, R_i_b_res=R_i_b_res)
+    Rrsb = bottom_reflectance.R_rs_b(p[9], p[10], p[11], p[12], p[13], p[14], B_0=B_0, B_1=B_1, B_2=B_2, B_3=B_3, B_4=B_4, B_5=B_5, wavelengths=wavelengths, R_i_b_res=R_i_b_res)
 
     ob = attenuation.omega_b(a_sim, b_b_sim) #ob is omega_b. Shortened to distinguish between new var and function params.
 
@@ -341,9 +353,9 @@ def dfun(p,
     else:
         E_d = E_d_res
 
-    L_s = sky_radiance.L_s(p[15], E_dd, p[16], E_dsr, p[17], E_dsa)
+    # L_s = sky_radiance.L_s(p[9], E_dd, p[10], E_dsr, p[11], E_dsa)
 
-    R_rs_surface = surface.R_rs_surf(L_s, E_d, rho_L)
+    # R_rs_surface = surface.R_rs_surf(L_s, E_d, rho_L)
 
     # R_rs_sim = R_rs_water + R_rs_surface + offset
 
@@ -643,7 +655,7 @@ def dfun(p,
     df_div_dg_dsa = (rho_L / E_d) * sky_radiance.d_LS_div_dg_dsa(E_dsa)
     df_div_dg_dsr = (rho_L / E_d) * sky_radiance.d_LS_div_dg_dsr(E_dsr)
 
-    zeros = np.zeros(len(wavelengths))
+    # zeros = np.zeros(len(wavelengths))
 
     return np.array([
         df_div_dC_0,
