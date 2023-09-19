@@ -59,7 +59,7 @@ def domega_b_div_dp(a, b_b, da_div_dp, db_b_div_dp):
 def K_d(a,
         b_b, 
         cos_t_sun_p=np.pi/6,
-        kappa_0 = 1.0546,
+        kappa_0=1.0546,
         ):
     """
     Diffuse attenuation for downwelling irradiance as implemented in WASI [1].

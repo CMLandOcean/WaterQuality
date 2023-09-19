@@ -37,9 +37,8 @@
 # [6] Gege & Albert (2006): A Tool for Inverse Modeling of Spectral Measurements in Deep and Shallow Waters. [10.1007/1-4020-3968-9_4]
 
 
-import numpy as np
-from .. atmosphere import sky_radiance, downwelling_irradiance
+def R_rs_surf(L_s, E_d, rho_l=0.02):
+    return rho_l * (L_s / E_d)
 
-def R_rs_surf(L_s, E_d, rho=0.02):
-    return rho * (L_s / E_d)
-
+def dR_rs_surf_dp(L_s, dL_s_div_dp, E_d, dE_d_div_dp, rho_l):
+    return rho_l * ((dL_s_div_dp / E_d) + (L_s * E_d**-2 * dE_d_div_dp))

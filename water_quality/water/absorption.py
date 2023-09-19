@@ -163,7 +163,7 @@ def da_Y_div_dS(C_Y = 0,
         lambda_0 = 440,
         a_Y_N_res = []):
     """
-    # Math: \frac{\partial}{\partial S}C_Y * e^{-S (\lambda - \lambda_0)} = C_Y \frac{\partial}{\partial S} e^{-S (\lambda - \lambda_0)}
+    # Math: \frac{\partial}{\partial S}\left[C_Y * e^{-S (\lambda - \lambda_0)}\right] = C_Y \frac{\partial}{\partial S} e^{-S (\lambda - \lambda_0)}
     # Math: = C_Y (\lambda_0 - \lambda) e^{-S (\lambda - \lambda_0)}
     """
     if len(a_Y_N_res) == 0:
@@ -278,7 +278,8 @@ def da_NAP_div_dC_X(
           S_NAP = 0.011,
           a_NAP_N_res=[]):
     """
-    # Math: \frac{\partial}{\partial C_{X}}a_{NAP} = a_{NAP}^*(\lambda_0) * e^{-S(\lambda - \lambda_0)}
+    # Math: \frac{\partial}{\partial C_{X}}a_{NAP} = \frac{\partial}{\partial C_{X}}\left[ (C_X + C_{Mie}) * a_{NAP}^*(\lambda_0) * e^{ -S_{NAP} (\lambda - \lambda_0) } \right]
+    # Math: = a_{NAP}^*(\lambda_0) * e^{-S(\lambda - \lambda_0)}
     """
     if len(a_NAP_N_res) == 0:
         a_NAP_N = np.exp(-S_NAP * (wavelengths - lambda_0))
@@ -296,7 +297,8 @@ def da_NAP_div_dC_Mie(
           S_NAP = 0.011,
           a_NAP_N_res=[]):
     """
-    # Math: \frac{\partial}{\partial C_{Mie}}a_{NAP} = a_{NAP}^*(\lambda_0) * norm_{a_{NAP}}(\lambda) 
+    # Math: \frac{\partial}{\partial C_{Mie}}a_{NAP} = \frac{\partial}{\partial C_{Mie}}\left[ (C_X + C_{Mie}) * a_{NAP}^*(\lambda_0) * e^{ -S_{NAP} (\lambda - \lambda_0) } \right]
+    # Math: = a_{NAP}^*(\lambda_0) * e^{-S(\lambda - \lambda_0)}
     """    
     if len(a_NAP_N_res) == 0:
         a_NAP_N = np.exp(-S_NAP * (wavelengths - lambda_0))
